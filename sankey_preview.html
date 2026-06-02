@@ -1,0 +1,1439 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sankey Preview</title>
+
+<style>
+    body {
+        margin: 0;
+        padding: 28px;
+        background:
+            radial-gradient(circle at top left, rgba(255,122,0,0.12), transparent 30%),
+            linear-gradient(135deg, #0f0f0f, #191919, #0b0b0b);
+        color: #ffffff;
+        font-family: Arial, Segoe UI, sans-serif;
+    }
+
+    .page {
+        max-width: 1600px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, #202020, #151515);
+        border: 1px solid #333333;
+        border-radius: 28px;
+        padding: 28px;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    }
+
+    .header {
+        border-bottom: 4px solid #ff7a00;
+        padding-bottom: 18px;
+        margin-bottom: 24px;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: 32px;
+    }
+
+    .subtitle {
+        color: #b8b8b8;
+        margin-top: 8px;
+        font-size: 14px;
+    }
+
+    .summary {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 24px;
+    }
+
+    .summary-card {
+        background: linear-gradient(135deg, #34363d, #1b1c22);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 16px;
+    }
+
+    .summary-title {
+        color: #b8b8b8;
+        font-size: 13px;
+        margin-bottom: 8px;
+    }
+
+    .summary-value {
+        color: #ffffff;
+        font-size: 26px;
+        font-weight: bold;
+    }
+
+    .chart-box {
+        background: #151515;
+        border: 1px solid #333333;
+        border-radius: 20px;
+        padding: 12px;
+        margin-bottom: 28px;
+    }
+
+    .table-box {
+        background: #151515;
+        border: 1px solid #333333;
+        border-radius: 20px;
+        padding: 16px;
+        max-height: 520px;
+        overflow: auto;
+    }
+
+    table.reason-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        color: #ffffff;
+    }
+
+    table.reason-table thead {
+        background: #2a2a2a;
+        position: sticky;
+        top: 0;
+    }
+
+    table.reason-table th {
+        color: #ff9a3d;
+        padding: 12px 10px;
+        text-align: left;
+        border-bottom: 1px solid #444444;
+    }
+
+    table.reason-table td {
+        padding: 10px;
+        border-bottom: 1px solid #2c2c2c;
+        color: #eeeeee;
+    }
+
+    table.reason-table tr:nth-child(even) {
+        background: rgba(255,255,255,0.025);
+    }
+
+    table.reason-table tr:hover {
+        background: rgba(255,122,0,0.08);
+    }
+</style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="header">
+            <h1>Sankey Funnel Preview</h1>
+            <div class="subtitle">
+                Request to Buy path with negative drop-off reasons from qualification_details.xlsx
+            </div>
+        </div>
+
+        <div class="summary">
+            <div class="summary-card">
+                <div class="summary-title">Total Rows / Requests</div>
+                <div class="summary-value">67,518</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-title">Not Qualified</div>
+                <div class="summary-value">35,679</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-title">OTP Verified</div>
+                <div class="summary-value">37,737</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-title">Buy</div>
+                <div class="summary-value">775</div>
+            </div>
+        </div>
+
+        <div class="chart-box">
+            <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="b7b130f7-dffb-48bc-810a-22a6484b035e" class="plotly-graph-div" style="height:760px; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("b7b130f7-dffb-48bc-810a-22a6484b035e")) {                    Plotly.newPlot(                        "b7b130f7-dffb-48bc-810a-22a6484b035e",                        [{"arrangement":"snap","link":{"color":["rgba(255, 122, 0, 0.35)","rgba(255, 122, 0, 0.35)","rgba(255, 122, 0, 0.35)","rgba(255, 122, 0, 0.35)","rgba(255, 122, 0, 0.35)","rgba(255, 122, 0, 0.35)","rgba(255, 122, 0, 0.35)","rgba(255, 122, 0, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 122, 0, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.28)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)","rgba(255, 176, 131, 0.35)"],"source":[0,1,2,3,4,5,6,7,0,2,1,4,6,3,7,5,9,9,9,9,9,9,9,9,9,9,9,10,10,10,10,10,10,10,10,10,10,10,10,10,11,11,11,11,11,11,11,11,11,11,11,11,11,12,12,12,12,12,12,12,12,12,12,12,12,12,13,13,13,13,13,13,13,13,13,13,13,13,13,14,14,14,14,14,14,14,14,14,14,14,14,14,15,15,15,15,15,15,15,15,15,15,15,15,15,16,16,16,16,16],"target":[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110],"value":[31839,26785,8099,5127,3452,3382,2881,637,35679,18686,5054,1675,501,2972,2244,70,8353,7449,6092,4632,3633,2313,2061,552,412,142,40,6097,2273,2231,2011,907,854,627,623,573,406,305,298,1481,2143,1665,158,139,116,101,76,72,60,53,35,32,404,797,143,137,136,130,95,41,25,21,20,19,18,93,112,107,80,39,34,24,20,17,16,14,13,13,12,966,403,388,272,259,187,77,61,42,40,38,27,212,1029,294,276,163,129,121,72,54,38,16,10,8,34,51,12,5,1,1]},"node":{"color":["rgba(255, 122, 0, 0.85)","rgba(255, 122, 0, 0.85)","rgba(255, 122, 0, 0.85)","rgba(255, 122, 0, 0.85)","rgba(255, 122, 0, 0.85)","rgba(255, 122, 0, 0.85)","rgba(255, 122, 0, 0.85)","rgba(255, 122, 0, 0.85)","rgba(0, 255, 132, 0.85)","rgba(255, 176, 131, 0.85)","rgba(255, 176, 131, 0.85)","rgba(255, 176, 131, 0.85)","rgba(255, 176, 131, 0.85)","rgba(255, 176, 131, 0.85)","rgba(255, 176, 131, 0.85)","rgba(255, 176, 131, 0.85)","rgba(255, 176, 131, 0.85)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)","rgba(110, 116, 133, 0.75)"],"label":["Request","Qualified Request","OTP Verified QR","Reserve","Conf Entrance","Entrance","Inspection","Auction","Buy","Not Qualified","Not Reserved","OTP Not Verified","No Entrance","No Auction","No Conf Entrance","No Buy","No Inspection","Not Qualified Reason: \u063a\u06cc\u0631 \u0642\u0627\u0628\u0644 \u0641\u0631\u0648\u0634","Not Qualified Reason: \u0633\u0627\u0644 \u0642\u062f\u06cc\u0645\u06cc","Not Qualified Reason: \u0641\u0639\u0644\u0627 \u0642\u0635\u062f \u0641\u0631\u0648\u0634 \u0646\u062f\u0627\u0631\u0645","Not Qualified Reason: \u06a9\u0627\u0631\u06a9\u0631\u062f \u0628\u0627\u0644\u0627","Not Qualified Reason: \u0634\u0647\u0631\u0633\u062a\u0627\u0646","Not Qualified Reason: \u0628\u0647 \u062f\u0646\u0628\u0627\u0644 \u062e\u0631\u06cc\u062f \u062e\u0648\u062f\u0631\u0648 \u0647\u0633\u062a\u0645","Not Qualified Reason: \u0639\u062f\u0645 \u06cc\u0627 \u0627\u0634\u062a\u0628\u0627\u0647 \u062f\u0631 \u062b\u0628\u062a \u0645\u0634\u062a\u0631\u06cc","Not Qualified Reason: \u062e\u0648\u062f\u0631\u0648 \u0646\u0627\u0645\u0646\u0627\u0633\u0628 \u062c\u0630\u0628","Not Qualified Reason: \u0646\u0627\u0645\u0631\u062a\u0628\u0637 \u0628\u0627 \u0641\u0631\u0648\u0634 \u062e\u0648\u062f\u0631\u0648","Not Qualified Reason: \u0622\u0633\u06cc\u0628 \u0633\u0642\u0641 \u0648 \u0633\u062a\u0648\u0646 \u0648 \u0634\u0627\u0633\u06cc","Not Qualified Reason: \u0642\u062f\u06cc\u0645\u06cc","Not Reserved Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f4","Not Reserved Reason: \u0645\u0631\u0627\u062c\u0639\u0647 \u062f\u0631 \u062a\u0627\u0631\u06cc\u062e \u062f\u06cc\u06af\u0631","Not Reserved Reason: \u0641\u0642\u0637 \u0645\u06cc\u200c\u062e\u0648\u0627\u0633\u062a\u0645 \u0627\u0633\u062a\u0639\u0644\u0627\u0645 \u0642\u06cc\u0645\u062a \u0628\u06af\u06cc\u0631\u0645","Not Reserved Reason: \u062a\u06a9\u0631\u0627\u0631\u06cc","Not Reserved Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f2","Not Reserved Reason: \u0641\u0631\u0648\u062e\u062a\u0647 \u0634\u062f","Not Reserved Reason: \u062e\u0648\u062f\u0631\u0648 \u0635\u0641\u0631","Not Reserved Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f1","Not Reserved Reason: \u0646\u06cc\u0627\u0632 \u0628\u0647 \u062a\u0645\u0627\u0633 \u0645\u062c\u062f\u062f","Not Reserved Reason: \u0639\u062f\u0645 \u0641\u06a9 \u0631\u0647\u0646","Not Reserved Reason: \u0648\u06a9\u0627\u0644\u062a\u0646\u0627\u0645\u0647 \u06a9\u0627\u0631\u06cc","Not Reserved Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f3","Not Reserved Reason: Others","OTP Not Verified Reason: No reason","OTP Not Verified Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f1","OTP Not Verified Reason: \u062a\u06a9\u0631\u0627\u0631\u06cc","OTP Not Verified Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f4","OTP Not Verified Reason: \u0641\u0631\u0648\u062e\u062a\u0647 \u0634\u062f","OTP Not Verified Reason: \u0645\u0631\u0627\u062c\u0639\u0647 \u062f\u0631 \u062a\u0627\u0631\u06cc\u062e \u062f\u06cc\u06af\u0631","OTP Not Verified Reason: \u0641\u0639\u0644\u0627 \u0642\u0635\u062f \u0641\u0631\u0648\u0634 \u0646\u062f\u0627\u0631\u0645","OTP Not Verified Reason: \u0642\u06cc\u0645\u062a \u067e\u06cc\u0634\u0646\u0647\u0627\u062f\u06cc \u067e\u0627\u06cc\u06cc\u0646 \u0628\u0648\u062f","OTP Not Verified Reason: \u062e\u0648\u062f\u0631\u0648 \u0635\u0641\u0631","OTP Not Verified Reason: \u0639\u062f\u0645 \u062a\u0648\u0627\u0641\u0642 \u062f\u06cc\u0644\u0631 \u062f\u0648\u0645","OTP Not Verified Reason: \u0645\u0634\u06a9\u0644 \u0634\u062e\u0635\u06cc","OTP Not Verified Reason: \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u062a\u06a9\u0631\u0627\u0631\u06cc","OTP Not Verified Reason: Others","No Entrance Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f1","No Entrance Reason: \u0641\u0639\u0644\u0627 \u0642\u0635\u062f \u0641\u0631\u0648\u0634 \u0646\u062f\u0627\u0631\u0645","No Entrance Reason: No reason","No Entrance Reason: \u0645\u0631\u0627\u062c\u0639\u0647 \u062f\u0631 \u062a\u0627\u0631\u06cc\u062e \u062f\u06cc\u06af\u0631","No Entrance Reason: \u0641\u0631\u0648\u062e\u062a\u0647 \u0634\u062f","No Entrance Reason: \u0645\u0634\u06a9\u0644 \u0634\u062e\u0635\u06cc","No Entrance Reason: \u062a\u0645\u0627\u0633 \u0645\u0634\u063a\u0648\u0644 \u0627\u0633\u062a","No Entrance Reason: \u062a\u06a9\u0631\u0627\u0631\u06cc","No Entrance Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f4","No Entrance Reason: \u0645\u0627\u0645\u0648\u0631\u06cc\u062a\u002f\u0645\u0633\u0627\u0641\u0631\u062a","No Entrance Reason: \u06a9\u0633\u0631\u06cc \u0645\u062f\u0627\u0631\u06a9","No Entrance Reason: \u0646\u06cc\u0627\u0632 \u0628\u0647 \u062a\u0645\u0627\u0633 \u0645\u062c\u062f\u062f","No Entrance Reason: Others","No Auction Reason: \u0646\u06cc\u0627\u0632 \u0628\u0647 \u0628\u0631\u0631\u0633\u06cc \u0628\u06cc\u0634\u062a\u0631","No Auction Reason: \u0645\u0634\u06a9\u0644 \u062d\u0642\u0648\u0642\u06cc","No Auction Reason: \u062e\u0648\u062f\u0631\u0648 2 \u062a\u0643\u0647\u002f \u0627\u062a\u0627\u0642 \u062a\u0639\u0648\u064a\u0636","No Auction Reason: \u062a\u06a9\u0631\u0627\u0631\u06cc","No Auction Reason: \u062a\u0631\u06a9 \u0634\u0639\u0628\u0647","No Auction Reason: \u0645\u062f\u0644 \u063a\u06cc\u0631 \u0641\u0639\u0627\u0644","No Auction Reason: \u06a9\u0633\u0631\u06cc \u0645\u062f\u0627\u0631\u06a9","No Auction Reason: \u0646\u06cc\u0627\u0632 \u0628\u0647 \u06a9\u0627\u0631\u0648\u0627\u0634","No Auction Reason: \u0633\u0627\u06cc\u0631","No Auction Reason: \u0645\u0646\u0635\u0631\u0641 \u0634\u062f\u0646 \u0645\u0627\u0644\u06a9","No Auction Reason: No reason","No Auction Reason: \u0645\u0648\u0627\u0641\u0642 \u0646\u0628\u0648\u062f\u0646 \u0628\u0627 \u0631\u0648\u0627\u0644 \u06a9\u0627\u0631\u06cc","No Auction Reason: Others","No Conf Entrance Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f4","No Conf Entrance Reason: \u0641\u0631\u0648\u062e\u062a\u0647 \u0634\u062f","No Conf Entrance Reason: \u0641\u0639\u0644\u0627 \u0642\u0635\u062f \u0641\u0631\u0648\u0634 \u0646\u062f\u0627\u0631\u0645","No Conf Entrance Reason: \u0645\u0634\u06a9\u0644 \u0634\u062e\u0635\u06cc","No Conf Entrance Reason: \u0645\u0631\u0627\u062c\u0639\u0647 \u062f\u0631 \u062a\u0627\u0631\u06cc\u062e \u062f\u06cc\u06af\u0631","No Conf Entrance Reason: No reason","No Conf Entrance Reason: \u0645\u0627\u0645\u0648\u0631\u06cc\u062a\u002f\u0645\u0633\u0627\u0641\u0631\u062a","No Conf Entrance Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f1","No Conf Entrance Reason: \u062a\u06a9\u0631\u0627\u0631\u06cc","No Conf Entrance Reason: \u0645\u0634\u06a9\u0644 \u0641\u0646\u06cc\u002f\u062a\u0635\u0627\u062f\u0641","No Conf Entrance Reason: \u0639\u062f\u0645 \u0648\u062c\u0648\u062f \u0645\u062f\u0627\u0631\u06a9","No Conf Entrance Reason: \u0639\u062f\u0645 \u062d\u0636\u0648\u0631 \u0645\u0627\u0644\u06a9","No Conf Entrance Reason: Others","No Buy Reason: No reason","No Buy Reason: \u0639\u062f\u0645 \u062a\u0648\u0627\u0641\u0642 \u062f\u06cc\u0644\u0631 \u062f\u0648\u0645","No Buy Reason: \u0642\u06cc\u0645\u062a \u067e\u06cc\u0634\u0646\u0647\u0627\u062f\u06cc \u067e\u0627\u06cc\u06cc\u0646 \u0628\u0648\u062f","No Buy Reason: \u0639\u062f\u0645 \u062a\u0648\u0627\u0641\u0642 \u0642\u06cc\u0645\u062a \u0627\u0639\u0644\u0627\u0645\u06cc \u062e\u0648\u062f\u0631\u0648 45","No Buy Reason: \u0641\u0631\u0648\u062e\u062a\u0647 \u0634\u062f","No Buy Reason: \u0641\u0639\u0644\u0627 \u0642\u0635\u062f \u0641\u0631\u0648\u0634 \u0646\u062f\u0627\u0631\u0645","No Buy Reason: \u062c\u0648\u0627\u0628 \u0646\u062f\u0627\u062f","No Buy Reason: \u0646\u06cc\u0627\u0632 \u0628\u0647 \u0641\u06a9\u0631","No Buy Reason: \u0627\u0646\u0635\u0631\u0627\u0641 \u0641\u0631\u0648\u0634\u0646\u062f\u0647 (\u0641\u0642\u062f\u0627\u0646 \u0645\u062f\u0627\u0631\u06a9)","No Buy Reason: \u062f\u0631\u062e\u0648\u0627\u0633\u062a \u0642\u06cc\u0645\u062a \u0646\u0627\u0645\u0639\u0642\u0648\u0644","No Buy Reason: \u0642\u0635\u062f \u0645\u0639\u0627\u0648\u0636\u0647 \u0628\u0627 \u062e\u0648\u062f\u0631\u0648 \u06a9\u0627\u0631\u06a9\u0631\u062f\u0647","No Buy Reason: \u0627\u0646\u0635\u0631\u0627\u0641 \u062e\u0631\u06cc\u062f\u0627\u0631 \u0628\u062f\u0648\u0646 \u062c\u0631\u06cc\u0645\u0647","No Buy Reason: Others","No Inspection Reason: No reason","No Inspection Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f1","No Inspection Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f3","No Inspection Reason: \u0628\u06cc \u067e\u0627\u0633\u062e \u06f2","No Inspection Reason: \u0645\u0648\u0627\u0641\u0642 \u0646\u0628\u0648\u062f\u0646 \u0628\u0627 \u0631\u0648\u0627\u0644 \u06a9\u0627\u0631\u06cc"],"line":{"color":"rgba(255,255,255,0.15)","width":1},"pad":20,"thickness":20},"type":"sankey"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"title":{"font":{"size":22,"color":"#FFFFFF"},"text":"Sankey Funnel - Request to Buy with Drop-off Reasons"},"font":{"size":12,"color":"#FFFFFF"},"margin":{"l":20,"r":20,"t":70,"b":20},"paper_bgcolor":"#151515","plot_bgcolor":"#151515","height":760},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+
+        <h2>Drop-off Reason Breakdown</h2>
+
+        <div class="table-box">
+            <table class="dataframe reason-table">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Drop-off Stage</th>
+      <th>Reason</th>
+      <th>Count</th>
+      <th>Share %</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Not Qualified</td>
+      <td>غیر قابل فروش</td>
+      <td>8,353</td>
+      <td>23.4%</td>
+    </tr>
+    <tr>
+      <td>Not Qualified</td>
+      <td>سال قدیمی</td>
+      <td>7,449</td>
+      <td>20.9%</td>
+    </tr>
+    <tr>
+      <td>Not Qualified</td>
+      <td>فعلا قصد فروش ندارم</td>
+      <td>6,092</td>
+      <td>17.1%</td>
+    </tr>
+    <tr>
+      <td>Not Qualified</td>
+      <td>کارکرد بالا</td>
+      <td>4,632</td>
+      <td>13.0%</td>
+    </tr>
+    <tr>
+      <td>Not Qualified</td>
+      <td>شهرستان</td>
+      <td>3,633</td>
+      <td>10.2%</td>
+    </tr>
+    <tr>
+      <td>Not Qualified</td>
+      <td>به دنبال خرید خودرو هستم</td>
+      <td>2,313</td>
+      <td>6.5%</td>
+    </tr>
+    <tr>
+      <td>Not Qualified</td>
+      <td>عدم یا اشتباه در ثبت مشتری</td>
+      <td>2,061</td>
+      <td>5.8%</td>
+    </tr>
+    <tr>
+      <td>Not Qualified</td>
+      <td>خودرو نامناسب جذب</td>
+      <td>552</td>
+      <td>1.5%</td>
+    </tr>
+    <tr>
+      <td>Not Qualified</td>
+      <td>نامرتبط با فروش خودرو</td>
+      <td>412</td>
+      <td>1.2%</td>
+    </tr>
+    <tr>
+      <td>Not Qualified</td>
+      <td>آسیب سقف و ستون و شاسی</td>
+      <td>142</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>Not Qualified</td>
+      <td>قدیمی</td>
+      <td>40</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>بی پاسخ ۴</td>
+      <td>6,097</td>
+      <td>32.6%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>مراجعه در تاریخ دیگر</td>
+      <td>2,273</td>
+      <td>12.2%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>فقط می‌خواستم استعلام قیمت بگیرم</td>
+      <td>2,231</td>
+      <td>11.9%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>تکراری</td>
+      <td>2,011</td>
+      <td>10.8%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>بی پاسخ ۲</td>
+      <td>907</td>
+      <td>4.9%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>فروخته شد</td>
+      <td>854</td>
+      <td>4.6%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>خودرو صفر</td>
+      <td>627</td>
+      <td>3.4%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>بی پاسخ ۱</td>
+      <td>623</td>
+      <td>3.3%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>نیاز به تماس مجدد</td>
+      <td>573</td>
+      <td>3.1%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>عدم فک رهن</td>
+      <td>406</td>
+      <td>2.2%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>وکالتنامه کاری</td>
+      <td>305</td>
+      <td>1.6%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>بی پاسخ ۳</td>
+      <td>298</td>
+      <td>1.6%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>عدم توافق قیمت اعلامی خودرو 45</td>
+      <td>247</td>
+      <td>1.3%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>عدم حضور مالک</td>
+      <td>242</td>
+      <td>1.3%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>خودرو صفر بدون مدارک</td>
+      <td>161</td>
+      <td>0.9%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>موافق نبودن با روال کاری</td>
+      <td>158</td>
+      <td>0.8%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>درخواست تکراری</td>
+      <td>148</td>
+      <td>0.8%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>کسری مدارک</td>
+      <td>128</td>
+      <td>0.7%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>دسترسی مناسب به شعب ندارم</td>
+      <td>107</td>
+      <td>0.6%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>درخواست کارشناسی سیار</td>
+      <td>91</td>
+      <td>0.5%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>قصد معاوضه با خودرو کارکرده</td>
+      <td>41</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>کاور / روکش</td>
+      <td>41</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>خروج از فابریک کارخانه</td>
+      <td>38</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>بی پاسخ ۵</td>
+      <td>27</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>خودرو تمام رنگ</td>
+      <td>18</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>دوگانه سوز دستی</td>
+      <td>18</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>تماس مشغول است</td>
+      <td>5</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>قصد معاوضه با خودرو صفر</td>
+      <td>4</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>شریک تجاری یا نمایشگاهی</td>
+      <td>4</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>نصب دستی گیربکس اتومات</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>خاموش است</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>Not Reserved</td>
+      <td>قطع تماس قبل از شروع مکالمه با مرکز تماس</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>No reason</td>
+      <td>2,143</td>
+      <td>42.4%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>بی پاسخ ۱</td>
+      <td>1,665</td>
+      <td>32.9%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>تکراری</td>
+      <td>158</td>
+      <td>3.1%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>بی پاسخ ۴</td>
+      <td>139</td>
+      <td>2.8%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>فروخته شد</td>
+      <td>116</td>
+      <td>2.3%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>مراجعه در تاریخ دیگر</td>
+      <td>101</td>
+      <td>2.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>فعلا قصد فروش ندارم</td>
+      <td>76</td>
+      <td>1.5%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>قیمت پیشنهادی پایین بود</td>
+      <td>72</td>
+      <td>1.4%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>خودرو صفر</td>
+      <td>60</td>
+      <td>1.2%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>عدم توافق دیلر دوم</td>
+      <td>53</td>
+      <td>1.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>مشکل شخصی</td>
+      <td>35</td>
+      <td>0.7%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>درخواست تکراری</td>
+      <td>32</td>
+      <td>0.6%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>عدم توافق قیمت اعلامی خودرو 45</td>
+      <td>32</td>
+      <td>0.6%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>عدم فک رهن</td>
+      <td>30</td>
+      <td>0.6%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>فقط می‌خواستم استعلام قیمت بگیرم</td>
+      <td>27</td>
+      <td>0.5%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>نیاز به بررسی بیشتر</td>
+      <td>23</td>
+      <td>0.5%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>کسری مدارک</td>
+      <td>23</td>
+      <td>0.5%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>نیاز به تماس مجدد</td>
+      <td>23</td>
+      <td>0.5%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>وکالتنامه کاری</td>
+      <td>20</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>بی پاسخ ۲</td>
+      <td>19</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>مشکل حقوقی</td>
+      <td>18</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>خودرو 2 تكه/ اتاق تعويض</td>
+      <td>18</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>جواب نداد</td>
+      <td>18</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>کارشناسی آزاد</td>
+      <td>16</td>
+      <td>0.3%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>عدم حضور مالک</td>
+      <td>13</td>
+      <td>0.3%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>درخواست کارشناسی سیار</td>
+      <td>11</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>ماموریت/مسافرت</td>
+      <td>11</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>انصراف فروشنده (فقدان مدارک)</td>
+      <td>10</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>موافق نبودن با روال کاری</td>
+      <td>10</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>ترک شعبه</td>
+      <td>9</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>نیاز به فکر</td>
+      <td>8</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>عدم وجود مدارک</td>
+      <td>6</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>کاور / روکش</td>
+      <td>6</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>تماس مشغول است</td>
+      <td>6</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>مشکل فنی/تصادف</td>
+      <td>5</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>بی پاسخ ۳</td>
+      <td>5</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>قصد معاوضه با خودرو کارکرده</td>
+      <td>4</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>خودرو صفر بدون مدارک</td>
+      <td>4</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>خروج از فابریک کارخانه</td>
+      <td>4</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>سایر</td>
+      <td>3</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>مدل غیر فعال</td>
+      <td>2</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>حل شدن مشکل مالی</td>
+      <td>2</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>دوگانه سوز دستی</td>
+      <td>2</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>دسترسی مناسب به شعب ندارم</td>
+      <td>2</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>خودرو تمام رنگ</td>
+      <td>2</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>آسیب سقف و ستون و شاسی</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>انصراف فروشنده (کارمزد 1%)</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>خاموش است</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>نظر به کارشناسی اشتباه</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>نوسانات اقتصادی</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>بی پاسخ ۵</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>اعلام قیمت قبل از کارشناسی</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>منصرف شدن مالک</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>ترک شعبه (معطلی زیاد)</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>انصراف خریدار بدون جریمه</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>نیاز به کارواش</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>OTP Not Verified</td>
+      <td>درخواست قیمت نامعقول</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>بی پاسخ ۱</td>
+      <td>797</td>
+      <td>47.6%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>فعلا قصد فروش ندارم</td>
+      <td>143</td>
+      <td>8.5%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>No reason</td>
+      <td>137</td>
+      <td>8.2%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>مراجعه در تاریخ دیگر</td>
+      <td>136</td>
+      <td>8.1%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>فروخته شد</td>
+      <td>130</td>
+      <td>7.8%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>مشکل شخصی</td>
+      <td>95</td>
+      <td>5.7%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>تماس مشغول است</td>
+      <td>41</td>
+      <td>2.4%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>تکراری</td>
+      <td>25</td>
+      <td>1.5%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>بی پاسخ ۴</td>
+      <td>21</td>
+      <td>1.3%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>ماموریت/مسافرت</td>
+      <td>20</td>
+      <td>1.2%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>کسری مدارک</td>
+      <td>19</td>
+      <td>1.1%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>نیاز به تماس مجدد</td>
+      <td>18</td>
+      <td>1.1%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>بی پاسخ ۲</td>
+      <td>17</td>
+      <td>1.0%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>عدم حضور مالک</td>
+      <td>15</td>
+      <td>0.9%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>مشکل فنی/تصادف</td>
+      <td>15</td>
+      <td>0.9%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>موافق نبودن با روال کاری</td>
+      <td>14</td>
+      <td>0.8%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>درخواست کارشناسی سیار</td>
+      <td>6</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>نوسانات اقتصادی</td>
+      <td>6</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>حل شدن مشکل مالی</td>
+      <td>5</td>
+      <td>0.3%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>خروج از فابریک کارخانه</td>
+      <td>4</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>بی پاسخ ۳</td>
+      <td>3</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>فقط می‌خواستم استعلام قیمت بگیرم</td>
+      <td>3</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>درخواست تکراری</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>شرایط آب/هوایی</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Entrance</td>
+      <td>دسترسی مناسب به شعب ندارم</td>
+      <td>1</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>نیاز به بررسی بیشتر</td>
+      <td>112</td>
+      <td>22.4%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>مشکل حقوقی</td>
+      <td>107</td>
+      <td>21.4%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>خودرو 2 تكه/ اتاق تعويض</td>
+      <td>80</td>
+      <td>16.0%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>تکراری</td>
+      <td>39</td>
+      <td>7.8%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>ترک شعبه</td>
+      <td>34</td>
+      <td>6.8%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>مدل غیر فعال</td>
+      <td>24</td>
+      <td>4.8%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>کسری مدارک</td>
+      <td>20</td>
+      <td>4.0%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>نیاز به کارواش</td>
+      <td>17</td>
+      <td>3.4%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>سایر</td>
+      <td>16</td>
+      <td>3.2%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>منصرف شدن مالک</td>
+      <td>14</td>
+      <td>2.8%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>No reason</td>
+      <td>13</td>
+      <td>2.6%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>موافق نبودن با روال کاری</td>
+      <td>13</td>
+      <td>2.6%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>ایراد فنی خودرو قبل از پایان کارشناسی</td>
+      <td>4</td>
+      <td>0.8%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>انصراف از فروش در حین کارشناسی</td>
+      <td>3</td>
+      <td>0.6%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>کارشناسی آزاد</td>
+      <td>2</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>ایراد رنگ/بدنه خودرو</td>
+      <td>1</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>بی پاسخ ۳</td>
+      <td>1</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>No Auction</td>
+      <td>بی پاسخ ۱</td>
+      <td>1</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>بی پاسخ ۴</td>
+      <td>966</td>
+      <td>32.5%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>فروخته شد</td>
+      <td>403</td>
+      <td>13.6%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>فعلا قصد فروش ندارم</td>
+      <td>388</td>
+      <td>13.1%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>مشکل شخصی</td>
+      <td>272</td>
+      <td>9.2%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>مراجعه در تاریخ دیگر</td>
+      <td>259</td>
+      <td>8.7%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>No reason</td>
+      <td>187</td>
+      <td>6.3%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>ماموریت/مسافرت</td>
+      <td>77</td>
+      <td>2.6%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>بی پاسخ ۱</td>
+      <td>61</td>
+      <td>2.1%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>تکراری</td>
+      <td>42</td>
+      <td>1.4%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>مشکل فنی/تصادف</td>
+      <td>40</td>
+      <td>1.3%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>عدم وجود مدارک</td>
+      <td>38</td>
+      <td>1.3%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>عدم حضور مالک</td>
+      <td>27</td>
+      <td>0.9%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>بی پاسخ ۲</td>
+      <td>24</td>
+      <td>0.8%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>تماس مشغول است</td>
+      <td>24</td>
+      <td>0.8%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>عدم توافق قیمت اعلامی خودرو 45</td>
+      <td>20</td>
+      <td>0.7%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>بی پاسخ ۳</td>
+      <td>20</td>
+      <td>0.7%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>حل شدن مشکل مالی</td>
+      <td>19</td>
+      <td>0.6%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>نوسانات اقتصادی</td>
+      <td>16</td>
+      <td>0.5%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>موافق نبودن با روال کاری</td>
+      <td>15</td>
+      <td>0.5%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>وکالتنامه کاری</td>
+      <td>12</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>نیاز به تماس مجدد</td>
+      <td>12</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>فقط می‌خواستم استعلام قیمت بگیرم</td>
+      <td>10</td>
+      <td>0.3%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>خروج از فابریک کارخانه</td>
+      <td>7</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>خودرو صفر</td>
+      <td>6</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>درخواست کارشناسی سیار</td>
+      <td>4</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>خودرو صفر بدون مدارک</td>
+      <td>4</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>دسترسی مناسب به شعب ندارم</td>
+      <td>4</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>آسیب سقف و ستون و شاسی</td>
+      <td>3</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>کاور / روکش</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>قصد معاوضه با خودرو کارکرده</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>قدیمی</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>درخواست تکراری</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>دوگانه سوز دستی</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>به دنبال خرید خودرو هستم</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>کارکرد بالا</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>No Conf Entrance</td>
+      <td>اعلام قیمت قبل از کارشناسی</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>No reason</td>
+      <td>1,029</td>
+      <td>45.9%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>عدم توافق دیلر دوم</td>
+      <td>294</td>
+      <td>13.1%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>قیمت پیشنهادی پایین بود</td>
+      <td>276</td>
+      <td>12.3%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>عدم توافق قیمت اعلامی خودرو 45</td>
+      <td>163</td>
+      <td>7.3%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>فروخته شد</td>
+      <td>129</td>
+      <td>5.7%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>فعلا قصد فروش ندارم</td>
+      <td>121</td>
+      <td>5.4%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>جواب نداد</td>
+      <td>72</td>
+      <td>3.2%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>نیاز به فکر</td>
+      <td>54</td>
+      <td>2.4%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>انصراف فروشنده (فقدان مدارک)</td>
+      <td>38</td>
+      <td>1.7%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>درخواست قیمت نامعقول</td>
+      <td>16</td>
+      <td>0.7%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>قصد معاوضه با خودرو کارکرده</td>
+      <td>10</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>انصراف خریدار بدون جریمه</td>
+      <td>8</td>
+      <td>0.4%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>ترک شعبه</td>
+      <td>7</td>
+      <td>0.3%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>فقط می‌خواستم استعلام قیمت بگیرم</td>
+      <td>4</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>انصراف فروشنده (نحوه تسویه حساب)</td>
+      <td>4</td>
+      <td>0.2%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>بی پاسخ ۱</td>
+      <td>3</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>انصراف فروشنده (تاخیر در پردازش قرارداد)</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>نظر به کارشناسی اشتباه</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>انصراف دیلر (عدم پایبندی به قیمت)</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>منصرف شدن مالک</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>انصراف فروشنده (مفاد مبایعه نامه)</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>انصراف فروشنده (وکالت ۴۵ روزه)</td>
+      <td>2</td>
+      <td>0.1%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>مزایده مجدد</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>مطالبه فروش فوری</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>ترک شعبه (عجله مشتری)</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>No Buy</td>
+      <td>ترک شعبه (معطلی زیاد)</td>
+      <td>1</td>
+      <td>0.0%</td>
+    </tr>
+    <tr>
+      <td>No Inspection</td>
+      <td>No reason</td>
+      <td>51</td>
+      <td>72.9%</td>
+    </tr>
+    <tr>
+      <td>No Inspection</td>
+      <td>بی پاسخ ۱</td>
+      <td>12</td>
+      <td>17.1%</td>
+    </tr>
+    <tr>
+      <td>No Inspection</td>
+      <td>بی پاسخ ۳</td>
+      <td>5</td>
+      <td>7.1%</td>
+    </tr>
+    <tr>
+      <td>No Inspection</td>
+      <td>بی پاسخ ۲</td>
+      <td>1</td>
+      <td>1.4%</td>
+    </tr>
+    <tr>
+      <td>No Inspection</td>
+      <td>موافق نبودن با روال کاری</td>
+      <td>1</td>
+      <td>1.4%</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,1470 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Marketing Performance Weekly Report</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        background:
+            radial-gradient(circle at top left, rgba(255,122,0,0.12), transparent 30%),
+            radial-gradient(circle at bottom right, rgba(255,122,0,0.08), transparent 32%),
+            linear-gradient(135deg, #0f0f0f 0%, #191919 48%, #0b0b0b 100%);
+        color: #ffffff;
+        font-family: Arial, Segoe UI, sans-serif;
+    }
+
+    .page {
+        width: 95%;
+        max-width: 1680px;
+        margin: 34px auto;
+        background: linear-gradient(135deg, #202020 0%, #181818 52%, #121212 100%);
+        border: 1px solid #333333;
+        border-radius: 30px;
+        padding: 34px;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.48);
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 4px solid #ff7a00;
+        padding-bottom: 22px;
+        margin-bottom: 30px;
+        gap: 24px;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 38px;
+        color: #ffffff;
+        letter-spacing: -0.6px;
+    }
+
+    .header p {
+        margin: 8px 0 0;
+        color: #b8b8b8;
+        font-size: 15px;
+    }
+
+    .badge {
+        background: linear-gradient(135deg, #2f2f2f, #1d1d1d);
+        color: #ff9a3d;
+        border: 1px solid #ff7a00;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-size: 14px;
+        white-space: nowrap;
+    }
+
+    /* =========================
+       Metric Cards - Dark Theme
+    ========================= */
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+    .metric-card {
+        min-height: 205px;
+        background:
+            radial-gradient(circle at top right, rgba(255,122,0,0.16), transparent 34%),
+            linear-gradient(135deg, #34363d 0%, #24262d 48%, #17181d 100%);
+        border-radius: 18px;
+        overflow: hidden;
+        position: relative;
+        color: #ffffff;
+        box-shadow: 0 14px 30px rgba(0,0,0,0.38);
+        border: 1px solid rgba(255,255,255,0.08);
+        padding-bottom: 16px;
+    }
+
+    .metric-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 7px;
+        height: 100%;
+        background: linear-gradient(180deg, #ff7a00, #ffb066);
+    }
+
+    .metric-top-line {
+        height: 5px;
+        background: linear-gradient(90deg, #ff7a00, rgba(255,122,0,0.15));
+    }
+
+    .metric-title {
+        padding: 20px 18px 0;
+        color: #cfd0d5;
+        font-size: 14px;
+        font-weight: bold;
+        padding-right: 92px;
+    }
+
+    .metric-value {
+        padding: 10px 18px 0;
+        color: #ffffff;
+        font-size: 32px;
+        font-weight: bold;
+        letter-spacing: -0.6px;
+    }
+
+    .metric-delta {
+        padding: 5px 18px 0;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .metric-visual {
+        position: absolute;
+        top: 22px;
+        right: 16px;
+        width: 76px;
+        padding: 8px;
+        border-radius: 14px;
+        background: rgba(0,0,0,0.22);
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .mini-label {
+        color: #aeb0b8;
+        font-size: 9px;
+        font-weight: bold;
+        margin-bottom: 6px;
+        text-align: center;
+    }
+
+    .bar-row {
+        display: grid;
+        grid-template-columns: 22px 1fr;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 5px;
+    }
+
+    .bar-row span {
+        color: #bfc1ca;
+        font-size: 9px;
+        font-weight: bold;
+    }
+
+    .mini-track {
+        height: 6px;
+        border-radius: 999px;
+        background: #343844;
+        overflow: hidden;
+    }
+
+    .mini-fill {
+        height: 100%;
+        border-radius: 999px;
+    }
+
+    .mini-fill.current {
+        background: linear-gradient(90deg, #ff7a00, #ffb066);
+    }
+
+    .mini-fill.previous {
+        background: linear-gradient(90deg, #7d8294, #c1c4cf);
+    }
+
+    .ring-visual {
+        width: 70px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .target-ring {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .target-ring::after {
+        content: "";
+        position: absolute;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #22242b;
+    }
+
+    .target-ring span {
+        position: relative;
+        z-index: 2;
+        font-size: 10px;
+        font-weight: bold;
+        color: #ffffff;
+    }
+
+    .positive {
+        color: #00ff84 !important;
+        font-weight: bold;
+    }
+
+    .negative {
+        color: #ffb083 !important;
+        font-weight: bold;
+    }
+
+    .neutral {
+        color: #d0d0d0 !important;
+        font-weight: bold;
+    }
+
+    .otp-target-box {
+        padding: 12px 18px 0;
+    }
+
+    .otp-target-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        color: #cfd0d5;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .otp-target-row.small {
+        margin-top: 6px;
+        margin-bottom: 0;
+        color: #aeb0b8;
+    }
+
+    .target-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 999px;
+        font-size: 10px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .target-badge.success {
+        background: rgba(0, 255, 132, 0.10);
+        color: #00ff84;
+        border: 1px solid rgba(0,255,132,0.45);
+    }
+
+    .target-badge.danger {
+        background: rgba(255, 122, 0, 0.14);
+        color: #ffb083;
+        border: 1px solid rgba(255,122,0,0.55);
+    }
+
+    .target-progress {
+        width: 100%;
+        height: 8px;
+        background: #343844;
+        border-radius: 999px;
+        overflow: hidden;
+    }
+
+    .target-progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ff7a00, #ffb066);
+        border-radius: 999px;
+    }
+
+    .sub-metric {
+        margin: 12px 18px 0;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(0,0,0,0.22);
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .sub-metric-label {
+        color: #aeb0b8;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .sub-metric-value {
+        color: #ffffff;
+        font-size: 19px;
+        font-weight: bold;
+        margin-top: 3px;
+    }
+
+    .sub-metric-change {
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    /* =========================
+       Tabs - Dark Theme
+    ========================= */
+    .tabs-shell {
+        margin-top: 8px;
+        background:
+            linear-gradient(135deg, #24262d 0%, #191a20 100%);
+        border: 1px solid #333743;
+        border-radius: 22px;
+        padding: 14px;
+        box-shadow: 0 18px 38px rgba(0,0,0,0.28);
+    }
+
+    .tabs {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+
+    .tab-button {
+        min-width: 210px;
+        border: 1px solid rgba(255,255,255,0.08);
+        outline: none;
+        cursor: pointer;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #343844, #242832);
+        color: #d8d9de;
+        font-size: 14px;
+        font-weight: bold;
+        transition: all 0.2s ease;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+    }
+
+    .tab-button:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255,122,0,0.5);
+        color: #ffffff;
+    }
+
+    .tab-button.active {
+        background: linear-gradient(135deg, #ff7a00, #d96c00);
+        color: #ffffff;
+        border-color: #ff9a3d;
+        box-shadow: 0 12px 24px rgba(255,122,0,0.18);
+    }
+
+    .tab-content {
+        display: none;
+        background:
+            radial-gradient(circle at top right, rgba(255,122,0,0.07), transparent 28%),
+            linear-gradient(135deg, #1d1f26, #14151a);
+        padding: 24px;
+        border-radius: 18px;
+        color: #ffffff;
+        border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .tab-section-title {
+        color: #ffffff;
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 6px;
+    }
+
+    .tab-section-subtitle {
+        color: #aeb0b8;
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+    .panel {
+        background: linear-gradient(135deg, #1d1d1d, #151515);
+        border: 1px solid #333333;
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: 0 14px 32px rgba(0,0,0,0.25);
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        border-radius: 16px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    /* =========================
+       Funnel Table - Cleaner Template
+    ========================= */
+    .funnel-table {
+        background: #17191f;
+        color: #ffffff;
+        font-size: 14px;
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: hidden;
+        border-radius: 16px;
+    }
+
+    .funnel-table thead {
+        background: linear-gradient(135deg, #2b2f3a, #22252e);
+    }
+
+    .funnel-table th {
+        color: #ff9a3d;
+        padding: 15px 14px;
+        text-align: center;
+        font-size: 13px;
+        letter-spacing: 0.2px;
+        border-bottom: 1px solid rgba(255,122,0,0.35);
+        white-space: nowrap;
+    }
+
+    .funnel-table th:first-child {
+        text-align: left;
+    }
+
+    .funnel-table td {
+        padding: 14px;
+        text-align: center;
+        color: #f1f1f1;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        white-space: nowrap;
+    }
+
+    .funnel-table tbody tr {
+        background: linear-gradient(135deg, #20232b, #1a1c22);
+        transition: all 0.18s ease;
+    }
+
+    .funnel-table tbody tr:nth-child(even) {
+        background: linear-gradient(135deg, #242731, #1d2028);
+    }
+
+    .funnel-table tbody tr:hover {
+        background: linear-gradient(135deg, rgba(255,122,0,0.16), rgba(255,122,0,0.05));
+        transform: scale(1.002);
+    }
+
+    .funnel-table .step-name {
+        text-align: left;
+        color: #ffffff;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+    }
+
+    .step-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #ff7a00;
+        box-shadow: 0 0 0 4px rgba(255,122,0,0.12);
+        flex: 0 0 auto;
+    }
+
+    .change-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 72px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: bold;
+        background: rgba(255,255,255,0.06);
+    }
+
+    .change-pill.positive {
+        background: rgba(0,255,132,0.10);
+        border: 1px solid rgba(0,255,132,0.28);
+    }
+
+    .change-pill.negative {
+        background: rgba(255,122,0,0.13);
+        border: 1px solid rgba(255,122,0,0.32);
+    }
+
+    .change-pill.neutral {
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* =========================
+       Channel Split
+    ========================= */
+    .channel-grid {
+        display: grid;
+        grid-template-columns: 0.95fr 1.05fr;
+        gap: 22px;
+        align-items: stretch;
+    }
+
+    .chart-panel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 455px;
+    }
+
+    .chart-panel img {
+        width: 100%;
+        max-width: 760px;
+        border-radius: 16px;
+    }
+
+    .scroll-box {
+        max-height: 455px;
+        overflow: auto;
+        border-radius: 12px;
+        border: 1px solid #333333;
+    }
+
+    .standard-table {
+        background: #171717;
+        color: #ffffff;
+        font-size: 13px;
+    }
+
+    .standard-table thead {
+        background: #2a2a2a;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+
+    .standard-table th {
+        color: #ff9a3d;
+        padding: 12px 10px;
+        text-align: left;
+        border-bottom: 1px solid #444444;
+        white-space: nowrap;
+    }
+
+    .standard-table td {
+        color: #eeeeee;
+        padding: 10px;
+        border-bottom: 1px solid #2c2c2c;
+        white-space: nowrap;
+    }
+
+    .standard-table tr:nth-child(even) {
+        background: rgba(255,255,255,0.025);
+    }
+
+    .standard-table tr:hover {
+        background: rgba(255,122,0,0.08);
+    }
+
+    .footer {
+        margin-top: 28px;
+        padding-top: 18px;
+        border-top: 1px solid #333333;
+        color: #888888;
+        font-size: 13px;
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+    }
+
+    @media screen and (max-width: 1450px) {
+        .metric-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .channel-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media screen and (max-width: 900px) {
+        .page {
+            width: 98%;
+            padding: 22px;
+        }
+
+        .header {
+            flex-direction: column;
+        }
+
+        .metric-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .tabs {
+            flex-direction: column;
+        }
+
+        .tab-button {
+            width: 100%;
+        }
+    }
+</style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="header">
+            <div>
+                <h1>Marketing Performance Weekly Report</h1>
+                <p>Current Week vs Previous Week</p>
+                <p>Source files: data/current_week.csv and data/previous_week.csv</p>
+            </div>
+
+            <div class="badge">
+                Generated: 2026-06-02 10:35
+            </div>
+        </div>
+
+        <div class="metric-grid">
+            
+    
+        <div class="metric-card">
+            <div class="metric-top-line"></div>
+
+            
+        <div class="metric-visual">
+            <div class="mini-label">CW / PW</div>
+
+            <div class="bar-row">
+                <span>CW</span>
+                <div class="mini-track">
+                    <div class="mini-fill current" style="width: 73.3%;"></div>
+                </div>
+            </div>
+
+            <div class="bar-row">
+                <span>PW</span>
+                <div class="mini-track">
+                    <div class="mini-fill previous" style="width: 100.0%;"></div>
+                </div>
+            </div>
+        </div>
+    
+
+            <div class="metric-title">Request</div>
+            <div class="metric-value">49,463</div>
+
+            <div class="metric-delta negative">
+                ▼ -26.7% vs previous week
+            </div>
+
+            
+        </div>
+    
+    
+        <div class="metric-card">
+            <div class="metric-top-line"></div>
+
+            
+        <div class="metric-visual">
+            <div class="mini-label">CW / PW</div>
+
+            <div class="bar-row">
+                <span>CW</span>
+                <div class="mini-track">
+                    <div class="mini-fill current" style="width: 78.2%;"></div>
+                </div>
+            </div>
+
+            <div class="bar-row">
+                <span>PW</span>
+                <div class="mini-track">
+                    <div class="mini-fill previous" style="width: 100.0%;"></div>
+                </div>
+            </div>
+        </div>
+    
+
+            <div class="metric-title">Qualified Request</div>
+            <div class="metric-value">24,838</div>
+
+            <div class="metric-delta negative">
+                ▼ -21.8% vs previous week
+            </div>
+
+            
+        </div>
+    
+    
+        <div class="metric-card">
+            <div class="metric-top-line"></div>
+
+            
+        <div class="metric-visual ring-visual">
+            <div
+                class="target-ring"
+                style="background: conic-gradient(#ff7a00 100.0%, #343844 0);"
+            >
+                <span>100%</span>
+            </div>
+            <div class="mini-label">Target</div>
+        </div>
+    
+
+            <div class="metric-title">OTP Verified QR</div>
+            <div class="metric-value">21,122</div>
+
+            <div class="metric-delta negative">
+                ▼ -20.9% vs previous week
+            </div>
+
+            
+    <div class="otp-target-box">
+        <div class="otp-target-row">
+            <span>Target: 19,000</span>
+            <span class="target-badge success">Target Achieved</span>
+        </div>
+
+        <div class="target-progress">
+            <div class="target-progress-fill" style="width: 100.0%;"></div>
+        </div>
+
+        <div class="otp-target-row small">
+            <span>111.2% achieved</span>
+            <span>+2,122</span>
+        </div>
+    </div>
+
+        </div>
+    
+    
+        <div class="metric-card">
+            <div class="metric-top-line"></div>
+
+            
+        <div class="metric-visual">
+            <div class="mini-label">CW / PW</div>
+
+            <div class="bar-row">
+                <span>CW</span>
+                <div class="mini-track">
+                    <div class="mini-fill current" style="width: 95.3%;"></div>
+                </div>
+            </div>
+
+            <div class="bar-row">
+                <span>PW</span>
+                <div class="mini-track">
+                    <div class="mini-fill previous" style="width: 100.0%;"></div>
+                </div>
+            </div>
+        </div>
+    
+
+            <div class="metric-title">Reserve</div>
+            <div class="metric-value">8,916</div>
+
+            <div class="metric-delta negative">
+                ▼ -4.7% vs previous week
+            </div>
+
+            
+    <div class="sub-metric">
+        <div class="sub-metric-label">Reserve / OTP CR</div>
+        <div class="sub-metric-value">42.2%</div>
+        <div class="sub-metric-change positive">
+            +7.2pp vs previous week
+        </div>
+    </div>
+
+        </div>
+    
+    
+        <div class="metric-card">
+            <div class="metric-top-line"></div>
+
+            
+        <div class="metric-visual">
+            <div class="mini-label">CW / PW</div>
+
+            <div class="bar-row">
+                <span>CW</span>
+                <div class="mini-track">
+                    <div class="mini-fill current" style="width: 78.6%;"></div>
+                </div>
+            </div>
+
+            <div class="bar-row">
+                <span>PW</span>
+                <div class="mini-track">
+                    <div class="mini-fill previous" style="width: 100.0%;"></div>
+                </div>
+            </div>
+        </div>
+    
+
+            <div class="metric-title">Buy</div>
+            <div class="metric-value">661</div>
+
+            <div class="metric-delta negative">
+                ▼ -21.4% vs previous week
+            </div>
+
+            
+        </div>
+    
+
+        </div>
+
+        <div class="tabs-shell">
+            <div class="tabs">
+                <button class="tab-button active" onclick="openTab(event, 'funnel-tab')">
+                    Funnel Performance
+                </button>
+
+                <button class="tab-button" onclick="openTab(event, 'channel-tab')">
+                    Channel Split
+                </button>
+
+                <button class="tab-button" onclick="openTab(event, 'current-table-tab')">
+                    Current Week Table
+                </button>
+            </div>
+
+            <div id="funnel-tab" class="tab-content active">
+                <div class="tab-section-title">Funnel Performance</div>
+                <div class="tab-section-subtitle">
+                    Reserve Request is ignored. Reserve is used as the funnel step.
+                </div>
+
+                <div class="panel">
+                    <div class="table-wrapper">
+                        
+        <table class="funnel-table">
+            <thead>
+                <tr>
+                    <th>Step of funnel</th>
+                    <th>Previous Week</th>
+                    <th>CR</th>
+                    <th>Current Week</th>
+                    <th>CR</th>
+                    <th>Change in Volume</th>
+                    <th>% Change in CR</th>
+                </tr>
+            </thead>
+            <tbody>
+    
+            <tr>
+                <td class="step-name">
+                    <span class="step-dot"></span>
+                    Request
+                </td>
+                <td>67,519</td>
+                <td>-</td>
+                <td>49,463</td>
+                <td>-</td>
+                <td>
+                    <span class="change-pill negative">
+                        -18,056
+                    </span>
+                </td>
+                <td>
+                    <span class="change-pill neutral">
+                        -
+                    </span>
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="step-name">
+                    <span class="step-dot"></span>
+                    Qualified Request
+                </td>
+                <td>31,767</td>
+                <td>47.0%</td>
+                <td>24,838</td>
+                <td>50.2%</td>
+                <td>
+                    <span class="change-pill negative">
+                        -6,929
+                    </span>
+                </td>
+                <td>
+                    <span class="change-pill positive">
+                        +3.2%
+                    </span>
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="step-name">
+                    <span class="step-dot"></span>
+                    OTP Verified QR
+                </td>
+                <td>26,711</td>
+                <td>84.1%</td>
+                <td>21,122</td>
+                <td>85.0%</td>
+                <td>
+                    <span class="change-pill negative">
+                        -5,589
+                    </span>
+                </td>
+                <td>
+                    <span class="change-pill positive">
+                        +1.0%
+                    </span>
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="step-name">
+                    <span class="step-dot"></span>
+                    Reserve
+                </td>
+                <td>9,359</td>
+                <td>35.0%</td>
+                <td>8,916</td>
+                <td>42.2%</td>
+                <td>
+                    <span class="change-pill negative">
+                        -443
+                    </span>
+                </td>
+                <td>
+                    <span class="change-pill positive">
+                        +7.2%
+                    </span>
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="step-name">
+                    <span class="step-dot"></span>
+                    Entrance
+                </td>
+                <td>4,398</td>
+                <td>47.0%</td>
+                <td>4,340</td>
+                <td>48.7%</td>
+                <td>
+                    <span class="change-pill negative">
+                        -58
+                    </span>
+                </td>
+                <td>
+                    <span class="change-pill positive">
+                        +1.7%
+                    </span>
+                </td>
+            </tr>
+        
+            <tr>
+                <td class="step-name">
+                    <span class="step-dot"></span>
+                    Buy
+                </td>
+                <td>841</td>
+                <td>19.1%</td>
+                <td>661</td>
+                <td>15.2%</td>
+                <td>
+                    <span class="change-pill negative">
+                        -180
+                    </span>
+                </td>
+                <td>
+                    <span class="change-pill negative">
+                        -3.9%
+                    </span>
+                </td>
+            </tr>
+        
+            </tbody>
+        </table>
+    
+                    </div>
+                </div>
+            </div>
+
+            <div id="channel-tab" class="tab-content">
+                <div class="tab-section-title">Channel Split by Qualified Request</div>
+                <div class="tab-section-subtitle">
+                    Current week only. Distribution based on attribution title and qualified request.
+                </div>
+
+                <div class="channel-grid">
+                    <div class="panel chart-panel">
+                        <img src="assets/channel_split_donut.png" alt="Channel Split Donut Chart">
+                    </div>
+
+                    <div class="panel">
+                        <div class="scroll-box">
+                            
+        <table class="standard-table">
+            <thead>
+                <tr>
+                    <th>Attribution Title</th>
+                    <th>Qualified Request</th>
+                    <th>Share %</th>
+                </tr>
+            </thead>
+            <tbody>
+    
+            <tr>
+                <td>organic</td>
+                <td>8,685</td>
+                <td>35.0%</td>
+            </tr>
+        
+            <tr>
+                <td>Yektanet-action</td>
+                <td>3,597</td>
+                <td>14.5%</td>
+            </tr>
+        
+            <tr>
+                <td>Direct</td>
+                <td>1,550</td>
+                <td>6.2%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-bale</td>
+                <td>1,354</td>
+                <td>5.5%</td>
+            </tr>
+        
+            <tr>
+                <td>offline-offline</td>
+                <td>1,279</td>
+                <td>5.1%</td>
+            </tr>
+        
+            <tr>
+                <td>Chavosh-social media</td>
+                <td>1,183</td>
+                <td>4.8%</td>
+            </tr>
+        
+            <tr>
+                <td>INTRACK</td>
+                <td>1,023</td>
+                <td>4.1%</td>
+            </tr>
+        
+            <tr>
+                <td>blog</td>
+                <td>935</td>
+                <td>3.8%</td>
+            </tr>
+        
+            <tr>
+                <td>asanpardakht-icon</td>
+                <td>828</td>
+                <td>3.3%</td>
+            </tr>
+        
+            <tr>
+                <td>affiliate program</td>
+                <td>767</td>
+                <td>3.1%</td>
+            </tr>
+        
+            <tr>
+                <td>googleads</td>
+                <td>641</td>
+                <td>2.6%</td>
+            </tr>
+        
+            <tr>
+                <td>Bale-pin</td>
+                <td>525</td>
+                <td>2.1%</td>
+            </tr>
+        
+            <tr>
+                <td>Tapsell-bale</td>
+                <td>497</td>
+                <td>2.0%</td>
+            </tr>
+        
+            <tr>
+                <td>pishgam-smsretargeting</td>
+                <td>334</td>
+                <td>1.3%</td>
+            </tr>
+        
+            <tr>
+                <td>Tapsell-web-native</td>
+                <td>217</td>
+                <td>0.9%</td>
+            </tr>
+        
+            <tr>
+                <td>bama-baner</td>
+                <td>198</td>
+                <td>0.8%</td>
+            </tr>
+        
+            <tr>
+                <td>Pump</td>
+                <td>153</td>
+                <td>0.6%</td>
+            </tr>
+        
+            <tr>
+                <td>signal-app</td>
+                <td>133</td>
+                <td>0.5%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-balepv</td>
+                <td>126</td>
+                <td>0.5%</td>
+            </tr>
+        
+            <tr>
+                <td>Jaryan-inchannel</td>
+                <td>122</td>
+                <td>0.5%</td>
+            </tr>
+        
+            <tr>
+                <td>tapsell-inapp</td>
+                <td>84</td>
+                <td>0.3%</td>
+            </tr>
+        
+            <tr>
+                <td>Magnet-rubikapv</td>
+                <td>84</td>
+                <td>0.3%</td>
+            </tr>
+        
+            <tr>
+                <td>badesaba-banner</td>
+                <td>71</td>
+                <td>0.3%</td>
+            </tr>
+        
+            <tr>
+                <td>toolbox-banner</td>
+                <td>65</td>
+                <td>0.3%</td>
+            </tr>
+        
+            <tr>
+                <td>sanbuk-inchannel</td>
+                <td>65</td>
+                <td>0.3%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-rubikapv</td>
+                <td>47</td>
+                <td>0.2%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-iranjib</td>
+                <td>28</td>
+                <td>0.1%</td>
+            </tr>
+        
+            <tr>
+                <td>offline-branch</td>
+                <td>28</td>
+                <td>0.1%</td>
+            </tr>
+        
+            <tr>
+                <td>Zarebin-icon</td>
+                <td>26</td>
+                <td>0.1%</td>
+            </tr>
+        
+            <tr>
+                <td>intrack-incoming call</td>
+                <td>25</td>
+                <td>0.1%</td>
+            </tr>
+        
+            <tr>
+                <td>social-owned-bale</td>
+                <td>23</td>
+                <td>0.1%</td>
+            </tr>
+        
+            <tr>
+                <td>Akharinkhodro-banner</td>
+                <td>22</td>
+                <td>0.1%</td>
+            </tr>
+        
+            <tr>
+                <td>Yelloadwise-icon</td>
+                <td>18</td>
+                <td>0.1%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-Divar</td>
+                <td>11</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>sanbuk-action</td>
+                <td>10</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>pishgam-sms</td>
+                <td>9</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>Pishgam-smsBULK</td>
+                <td>8</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>pedal-banner</td>
+                <td>8</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>chavosh-web</td>
+                <td>8</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-cpa</td>
+                <td>6</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-rubika</td>
+                <td>6</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>adverge-native</td>
+                <td>4</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>toolbox-app</td>
+                <td>3</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>tapsell_web_banner</td>
+                <td>3</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>chatgpt</td>
+                <td>3</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>Carstan-banner</td>
+                <td>3</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>nazarkadeh</td>
+                <td>3</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>Affilio</td>
+                <td>2</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>Unknown</td>
+                <td>2</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>Social-owned-telegram</td>
+                <td>2</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>social-bio</td>
+                <td>2</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>ecrm-mediana</td>
+                <td>2</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>Yelloadwise-sms-ads</td>
+                <td>2</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>neshan-banner</td>
+                <td>1</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>chavosh-instagram</td>
+                <td>1</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>Yelloadwise-sms</td>
+                <td>1</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>pishgam-lba</td>
+                <td>1</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>digipay-sms</td>
+                <td>1</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-sms</td>
+                <td>1</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-cpc</td>
+                <td>1</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-push-targeted</td>
+                <td>1</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>Asanpardakht-sms</td>
+                <td>0</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>ecrm-retargeting-m</td>
+                <td>0</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>Tapsell-web-Nativevideo</td>
+                <td>0</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>socianet-insta</td>
+                <td>0</td>
+                <td>0.0%</td>
+            </tr>
+        
+            <tr>
+                <td>yektanet-inapp</td>
+                <td>0</td>
+                <td>0.0%</td>
+            </tr>
+        
+            </tbody>
+        </table>
+    
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="current-table-tab" class="tab-content">
+                <div class="tab-section-title">Current Week Attribution Performance</div>
+                <div class="tab-section-subtitle">
+                    Current week only. Sorted by request descending.
+                </div>
+
+                <div class="panel">
+                    <div class="scroll-box">
+                        
+        <table class="standard-table">
+            <thead>
+                <tr>
+    <th>attribution_title</th><th>request</th><th>qualified request</th><th>OTP verified QR</th><th>Reserve</th><th>Entrance</th><th>Buy</th><th>revenue</th><th>Otp/QR</th><th>Reserve/OTP</th><th>Entrance/Reserve</th><th>Buy/OTP verified</th>
+                </tr>
+            </thead>
+            <tbody>
+    <tr><td>organic</td><td>14,538</td><td>8,685</td><td>8,095</td><td>3,605</td><td>1,916</td><td>320</td><td>19,769,180,000</td><td>93.2%</td><td>44.5%</td><td>53.1%</td><td>4.0%</td></tr><tr><td>Yektanet-action</td><td>8,947</td><td>3,597</td><td>2,954</td><td>804</td><td>299</td><td>25</td><td>1,789,000,000</td><td>82.1%</td><td>27.2%</td><td>37.2%</td><td>0.8%</td></tr><tr><td>yektanet-bale</td><td>3,079</td><td>1,354</td><td>1,167</td><td>298</td><td>77</td><td>7</td><td>393,000,000</td><td>86.2%</td><td>25.5%</td><td>25.8%</td><td>0.6%</td></tr><tr><td>Chavosh-social media</td><td>2,967</td><td>1,183</td><td>1,057</td><td>350</td><td>120</td><td>10</td><td>1,233,000,000</td><td>89.3%</td><td>33.1%</td><td>34.3%</td><td>0.9%</td></tr><tr><td>blog</td><td>2,894</td><td>935</td><td>782</td><td>237</td><td>79</td><td>10</td><td>570,000,000</td><td>83.6%</td><td>30.3%</td><td>33.3%</td><td>1.3%</td></tr><tr><td>Direct</td><td>2,757</td><td>1,550</td><td>1,462</td><td>680</td><td>359</td><td>56</td><td>4,697,000,000</td><td>94.3%</td><td>46.5%</td><td>52.8%</td><td>3.8%</td></tr><tr><td>asanpardakht-icon</td><td>2,119</td><td>828</td><td>730</td><td>197</td><td>58</td><td>8</td><td>268,000,000</td><td>88.2%</td><td>27.0%</td><td>29.4%</td><td>1.1%</td></tr><tr><td>INTRACK</td><td>2,102</td><td>1,023</td><td>955</td><td>330</td><td>194</td><td>28</td><td>2,872,861,000</td><td>93.4%</td><td>34.6%</td><td>58.8%</td><td>2.9%</td></tr><tr><td>offline-offline</td><td>1,332</td><td>1,279</td><td>0</td><td>1,061</td><td>618</td><td>120</td><td>7,152,400,000</td><td>0.0%</td><td>0.0%</td><td>58.2%</td><td>0.0%</td></tr><tr><td>affiliate program</td><td>1,199</td><td>767</td><td>712</td><td>347</td><td>179</td><td>19</td><td>1,308,000,000</td><td>92.8%</td><td>48.7%</td><td>51.6%</td><td>2.7%</td></tr><tr><td>Bale-pin</td><td>1,147</td><td>525</td><td>456</td><td>105</td><td>30</td><td>3</td><td>120,600,000</td><td>86.9%</td><td>23.0%</td><td>28.6%</td><td>0.7%</td></tr><tr><td>googleads</td><td>1,137</td><td>641</td><td>591</td><td>241</td><td>123</td><td>18</td><td>898,000,000</td><td>92.2%</td><td>40.8%</td><td>51.0%</td><td>3.0%</td></tr><tr><td>Tapsell-bale</td><td>1,015</td><td>497</td><td>426</td><td>108</td><td>45</td><td>8</td><td>464,000,000</td><td>85.7%</td><td>25.4%</td><td>41.7%</td><td>1.9%</td></tr><tr><td>Tapsell-web-native</td><td>477</td><td>217</td><td>174</td><td>44</td><td>16</td><td>3</td><td>143,000,000</td><td>80.2%</td><td>25.3%</td><td>36.4%</td><td>1.7%</td></tr><tr><td>pishgam-smsretargeting</td><td>414</td><td>334</td><td>321</td><td>140</td><td>79</td><td>8</td><td>517,000,000</td><td>96.1%</td><td>43.6%</td><td>56.4%</td><td>2.5%</td></tr><tr><td>Pump</td><td>397</td><td>153</td><td>115</td><td>5</td><td>0</td><td>0</td><td>0</td><td>75.2%</td><td>4.3%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>bama-baner</td><td>339</td><td>198</td><td>185</td><td>68</td><td>28</td><td>3</td><td>244,000,000</td><td>93.4%</td><td>36.8%</td><td>41.2%</td><td>1.6%</td></tr><tr><td>Jaryan-inchannel</td><td>315</td><td>122</td><td>110</td><td>41</td><td>15</td><td>1</td><td>53,000,000</td><td>90.2%</td><td>37.3%</td><td>36.6%</td><td>0.9%</td></tr><tr><td>signal-app</td><td>291</td><td>133</td><td>112</td><td>20</td><td>1</td><td>0</td><td>0</td><td>84.2%</td><td>17.9%</td><td>5.0%</td><td>0.0%</td></tr><tr><td>tapsell-inapp</td><td>253</td><td>84</td><td>67</td><td>15</td><td>3</td><td>0</td><td>0</td><td>79.8%</td><td>22.4%</td><td>20.0%</td><td>0.0%</td></tr><tr><td>yektanet-balepv</td><td>245</td><td>126</td><td>117</td><td>37</td><td>16</td><td>2</td><td>73,000,000</td><td>92.9%</td><td>31.6%</td><td>43.2%</td><td>1.7%</td></tr><tr><td>Magnet-rubikapv</td><td>229</td><td>84</td><td>79</td><td>25</td><td>9</td><td>1</td><td>25,000,000</td><td>94.0%</td><td>31.6%</td><td>36.0%</td><td>1.3%</td></tr><tr><td>sanbuk-inchannel</td><td>197</td><td>65</td><td>52</td><td>17</td><td>4</td><td>1</td><td>45,000,000</td><td>80.0%</td><td>32.7%</td><td>23.5%</td><td>1.9%</td></tr><tr><td>badesaba-banner</td><td>192</td><td>71</td><td>59</td><td>18</td><td>4</td><td>0</td><td>0</td><td>83.1%</td><td>30.5%</td><td>22.2%</td><td>0.0%</td></tr><tr><td>toolbox-banner</td><td>188</td><td>65</td><td>55</td><td>11</td><td>3</td><td>1</td><td>44,800,000</td><td>84.6%</td><td>20.0%</td><td>27.3%</td><td>1.8%</td></tr><tr><td>Zarebin-icon</td><td>126</td><td>26</td><td>18</td><td>2</td><td>0</td><td>0</td><td>0</td><td>69.2%</td><td>11.1%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>yektanet-rubikapv</td><td>118</td><td>47</td><td>47</td><td>15</td><td>4</td><td>0</td><td>0</td><td>100.0%</td><td>31.9%</td><td>26.7%</td><td>0.0%</td></tr><tr><td>yektanet-iranjib</td><td>46</td><td>28</td><td>22</td><td>5</td><td>2</td><td>0</td><td>0</td><td>78.6%</td><td>22.7%</td><td>40.0%</td><td>0.0%</td></tr><tr><td>Akharinkhodro-banner</td><td>42</td><td>22</td><td>20</td><td>5</td><td>3</td><td>0</td><td>0</td><td>90.9%</td><td>25.0%</td><td>60.0%</td><td>0.0%</td></tr><tr><td>social-owned-bale</td><td>41</td><td>23</td><td>21</td><td>14</td><td>10</td><td>1</td><td>46,000,000</td><td>91.3%</td><td>66.7%</td><td>71.4%</td><td>4.8%</td></tr><tr><td>intrack-incoming call</td><td>31</td><td>25</td><td>25</td><td>9</td><td>5</td><td>0</td><td>0</td><td>100.0%</td><td>36.0%</td><td>55.6%</td><td>0.0%</td></tr><tr><td>Pishgam-smsBULK</td><td>31</td><td>8</td><td>8</td><td>5</td><td>3</td><td>0</td><td>0</td><td>100.0%</td><td>62.5%</td><td>60.0%</td><td>0.0%</td></tr><tr><td>offline-branch</td><td>30</td><td>28</td><td>28</td><td>27</td><td>23</td><td>6</td><td>251,000,000</td><td>100.0%</td><td>96.4%</td><td>85.2%</td><td>21.4%</td></tr><tr><td>Yelloadwise-icon</td><td>29</td><td>18</td><td>13</td><td>4</td><td>2</td><td>1</td><td>23,000,000</td><td>72.2%</td><td>30.8%</td><td>50.0%</td><td>7.7%</td></tr><tr><td>chavosh-web</td><td>26</td><td>8</td><td>8</td><td>1</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>12.5%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>pishgam-sms</td><td>23</td><td>9</td><td>8</td><td>1</td><td>0</td><td>0</td><td>0</td><td>88.9%</td><td>12.5%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>toolbox-app</td><td>18</td><td>3</td><td>2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>66.7%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>pedal-banner</td><td>17</td><td>8</td><td>8</td><td>2</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>25.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>yektanet-Divar</td><td>16</td><td>11</td><td>11</td><td>3</td><td>2</td><td>1</td><td>51,000,000</td><td>100.0%</td><td>27.3%</td><td>66.7%</td><td>9.1%</td></tr><tr><td>sanbuk-action</td><td>16</td><td>10</td><td>7</td><td>1</td><td>1</td><td>0</td><td>0</td><td>70.0%</td><td>14.3%</td><td>100.0%</td><td>0.0%</td></tr><tr><td>yektanet-cpa</td><td>13</td><td>6</td><td>4</td><td>2</td><td>2</td><td>0</td><td>0</td><td>66.7%</td><td>50.0%</td><td>100.0%</td><td>0.0%</td></tr><tr><td>yektanet-rubika</td><td>12</td><td>6</td><td>6</td><td>1</td><td>1</td><td>0</td><td>0</td><td>100.0%</td><td>16.7%</td><td>100.0%</td><td>0.0%</td></tr><tr><td>tapsell_web_banner</td><td>6</td><td>3</td><td>2</td><td>1</td><td>1</td><td>0</td><td>0</td><td>66.7%</td><td>50.0%</td><td>100.0%</td><td>0.0%</td></tr><tr><td>yektanet-sms</td><td>4</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>44,000,000</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>0.0%</td></tr><tr><td>adverge-native</td><td>4</td><td>4</td><td>3</td><td>3</td><td>1</td><td>0</td><td>0</td><td>75.0%</td><td>100.0%</td><td>33.3%</td><td>0.0%</td></tr><tr><td>chatgpt</td><td>4</td><td>3</td><td>3</td><td>2</td><td>1</td><td>0</td><td>0</td><td>100.0%</td><td>66.7%</td><td>50.0%</td><td>0.0%</td></tr><tr><td>yektanet-push-targeted</td><td>3</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>Unknown</td><td>3</td><td>2</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>50.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>Carstan-banner</td><td>3</td><td>3</td><td>3</td><td>0</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>chavosh-instagram</td><td>3</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>100.0%</td><td>100.0%</td><td>100.0%</td><td>0.0%</td></tr><tr><td>Yelloadwise-sms-ads</td><td>3</td><td>2</td><td>2</td><td>2</td><td>1</td><td>0</td><td>0</td><td>100.0%</td><td>100.0%</td><td>50.0%</td><td>0.0%</td></tr><tr><td>nazarkadeh</td><td>3</td><td>3</td><td>3</td><td>0</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>ecrm-mediana</td><td>3</td><td>2</td><td>2</td><td>1</td><td>1</td><td>0</td><td>0</td><td>100.0%</td><td>50.0%</td><td>100.0%</td><td>0.0%</td></tr><tr><td>Affilio</td><td>2</td><td>2</td><td>2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>Tapsell-web-Nativevideo</td><td>2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>Social-owned-telegram</td><td>2</td><td>2</td><td>2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>social-bio</td><td>2</td><td>2</td><td>2</td><td>1</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>50.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>ecrm-retargeting-m</td><td>2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>yektanet-inapp</td><td>2</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>digipay-sms</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>Asanpardakht-sms</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>Yelloadwise-sms</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>100.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>pishgam-lba</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>100.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>neshan-banner</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>100.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>socianet-insta</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr><tr><td>yektanet-cpc</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>100.0%</td><td>0.0%</td><td>0.0%</td><td>0.0%</td></tr>
+            </tbody>
+        </table>
+    
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span>Report generated automatically using Python.</span>
+            <span>OTP Target: 19,000</span>
+        </div>
+    </div>
+
+<script>
+    function openTab(event, tabId) {
+        const contents = document.querySelectorAll('.tab-content');
+        const buttons = document.querySelectorAll('.tab-button');
+
+        contents.forEach(content => {
+            content.classList.remove('active');
+        });
+
+        buttons.forEach(button => {
+            button.classList.remove('active');
+        });
+
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
