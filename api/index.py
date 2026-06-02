@@ -1,19 +1,18 @@
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 app = FastAPI()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-@app.get("/", response_class=HTMLResponse)
-def weekly_report():
-    html_path = BASE_DIR / "weekly_report.html"
-    return html_path.read_text(encoding="utf-8")
+# این خط باعث می‌شود فایل‌های داخل پوشه assets روی سایت قابل دسترسی باشند
+app.mount("/assets", StaticFiles(directory=BASE_DIR / "assets"), name="assets")
 
-@app.get("/sankey", response_class=HTMLResponse)
-def sankey_preview():
-    html_path = BASE_DIR / "sankey_preview.html"
+@app.get("/", response_class=HTMLResponse)
+def home():
+    html_path = BASE_DIR / "weekly_report.html"
     return html_path.read_text(encoding="utf-8")
 
 @app.get("/weekly_report.png")
