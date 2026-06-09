@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سنجه — Project Overview</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        :root {
+            --navy: #1a2d4a;
+            --navy-deep: #0f1c30;
+            --teal: #26c6da;
+            --blue: #2196f3;
+            --green: #2ecc71;
+            --text: #ffffff;
+            --muted: #b8c5d6;
+            --panel: rgba(255,255,255,0.06);
+            --line: rgba(255,255,255,0.1);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(38,198,218,0.18), transparent 35%),
+                radial-gradient(circle at 85% 80%, rgba(33,150,243,0.14), transparent 38%),
+                linear-gradient(160deg, #0c1525 0%, #152238 45%, #0a1220 100%);
+            color: var(--text);
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            line-height: 1.75;
+        }
+
+        .page {
+            width: 95%;
+            max-width: 980px;
+            margin: 28px auto 48px;
+            background: linear-gradient(180deg, rgba(26,45,74,0.35) 0%, rgba(15,28,48,0.9) 100%);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 28px 64px rgba(0,0,0,0.45);
+            position: relative;
+        }
+
+        .decor-ref {
+            position: absolute;
+            left: -40px;
+            bottom: 120px;
+            width: 220px;
+            opacity: 0.07;
+            pointer-events: none;
+            filter: blur(1px);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 24px;
+            align-items: center;
+            padding: 36px 40px 28px;
+            background: linear-gradient(135deg, var(--navy-deep) 0%, var(--navy) 55%, #1e3a5f 100%);
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(90deg, var(--teal), var(--blue)) 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 80px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 80'%3E%3Cpath d='M0 60 Q100 20 200 50 T400 40 L400 80 L0 80 Z' fill='none' stroke='%2326C6DA' stroke-width='2' opacity='0.25'/%3E%3C/svg%3E") center bottom / cover no-repeat;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .hero-brand {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-wrap {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+            flex-shrink: 0;
+        }
+
+        .logo-img {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+            border-radius: 14px;
+        }
+
+        .logo-mark { width: 44px; height: 44px; }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 36px;
+            font-weight: 700;
+        }
+
+        .hero-tagline {
+            margin: 4px 0 0;
+            font-size: 14px;
+            color: var(--teal);
+            font-weight: 600;
+        }
+
+        .hero-subtitle {
+            margin: 8px 0 0;
+            color: var(--muted);
+            font-size: 15px;
+            max-width: 420px;
+        }
+
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .badge {
+            padding: 8px 14px;
+            font-size: 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(38,198,218,0.45);
+            background: rgba(38,198,218,0.12);
+            color: #a8ecf7;
+        }
+
+        .badge.phase {
+            border-color: rgba(33,150,243,0.4);
+            background: rgba(33,150,243,0.12);
+            color: #b3d9ff;
+        }
+
+        .hero-visual {
+            position: relative;
+            z-index: 1;
+        }
+
+        .app-shot {
+            width: 200px;
+            border-radius: 22px;
+            border: 3px solid rgba(255,255,255,0.15);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+        }
+
+        .cover-label {
+            margin: 0 0 6px;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.55);
+        }
+
+        .body { padding: 12px 40px 36px; position: relative; z-index: 1; }
+
+        section {
+            padding: 26px 0;
+            border-bottom: 1px solid var(--line);
+        }
+
+        section:last-child { border-bottom: none; }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .section-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(38,198,218,0.2), rgba(33,150,243,0.2));
+            border: 1px solid rgba(255,255,255,0.12);
+            color: var(--teal);
+        }
+
+        .section-number {
+            margin: 0;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--teal);
+            letter-spacing: 0.08em;
+        }
+
+        .section-title {
+            margin: 2px 0 0;
+            font-size: 21px;
+            font-weight: 700;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            padding: 20px 22px;
+            backdrop-filter: blur(8px);
+        }
+
+        .overview-grid { display: grid; gap: 16px; }
+
+        .overview-item {
+            display: grid;
+            grid-template-columns: 36px 120px 1fr;
+            gap: 12px 16px;
+            align-items: start;
+        }
+
+        .overview-item .row-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(38,198,218,0.15);
+            color: var(--teal);
+        }
+
+        .overview-item dt {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--muted);
+            padding-top: 6px;
+        }
+
+        .overview-item dd {
+            margin: 0;
+            font-size: 15px;
+            padding-top: 4px;
+        }
+
+        .overview-item dd.lead {
+            color: var(--muted);
+            line-height: 1.85;
+        }
+
+        .icon-svg {
+            display: inline-flex;
+            width: 22px;
+            height: 22px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-svg svg { width: 100%; height: 100%; }
+
+        .section-icon { width: 26px; height: 26px; }
+
+        .item-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .item-list li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--line);
+            font-size: 15px;
+        }
+
+        .item-list li:last-child { border-bottom: none; }
+
+        .item-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, rgba(38,198,218,0.18), rgba(33,150,243,0.12));
+            color: var(--teal);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .item-text { flex: 1; }
+
+        .deliverables-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .deliverable-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 18px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            backdrop-filter: blur(6px);
+        }
+
+        .deliverable-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--teal), var(--blue));
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .deliverable-icon .icon-svg { width: 24px; height: 24px; }
+
+        .requirements-note {
+            margin-top: 16px;
+            padding: 16px 20px;
+            font-size: 13px;
+            color: var(--muted);
+            background: rgba(33,150,243,0.1);
+            border-right: 4px solid var(--blue);
+            border-radius: 12px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .requirements-note .note-icon {
+            color: var(--blue);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 20px 40px 28px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.45);
+            border-top: 1px solid var(--line);
+            background: rgba(0,0,0,0.15);
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .footer-brand .icon-svg { width: 18px; height: 18px; color: var(--teal); }
+
+        @media (max-width: 720px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .hero-brand { flex-direction: column; }
+            .hero-visual { display: flex; justify-content: center; }
+            .hero-subtitle { max-width: none; }
+            .hero-badges { justify-content: center; }
+            .body, .hero, .footer { padding-left: 24px; padding-right: 24px; }
+            .overview-item { grid-template-columns: 36px 1fr; }
+            .overview-item dt { grid-column: 2; padding-top: 0; }
+            .overview-item dd { grid-column: 2; }
+            .deliverables-grid { grid-template-columns: 1fr; }
+            .app-shot { width: 170px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <img src="assets/sanje/design-ref.png" alt="" class="decor-ref" aria-hidden="true">
+
+    <header class="hero">
+        <div>
+            <div class="hero-brand">
+                <div class="logo-wrap"><span class="icon-svg logo-img-svg" aria-hidden="true">
+    <svg class="logo-mark" viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M8 32 L24 8 L28 16 L16 32 Z" fill="#26C6DA"/>
+      <path d="M20 40 L40 16 L36 8 L24 32 Z" fill="#2196F3"/>
+    </svg>
+    </span></div>
+                <div>
+                    <p class="cover-label">پروپوزال اجرایی · PROJECT OVERVIEW</p>
+                    <h1>سنجه</h1>
+                    <p class="hero-tagline">اپلیکیشن تخمین قیمت و تحلیل بازار خودرو</p>
+                    <p class="hero-subtitle">زیرساخت اندازه‌گیری، اتریبیوشن و آمادگی انتشار</p>
+                </div>
+            </div>
+            <div class="hero-badges">
+                <span class="badge">پیش‌آغاز پروژه</span>
+                <span class="badge phase">وضعیت: آماده‌سازی — فعالیت اجرایی آغاز نشده</span>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <img src="assets/sanje/app-home.png" alt="صفحه اصلی اپلیکیشن سنجه" class="app-shot">
+        </div>
+        
+    </header>
+
+    <main class="body">
+
+        <section id="overview">
+            
+    <div class="section-head">
+        <div class="section-icon-wrap"><span class="icon-svg section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 17h14M7 13l3-6 4 8 3-5 2 3"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/></svg></span></div>
+        <div>
+            <p class="section-number">۰۱</p>
+            <h2 class="section-title">Project Overview</h2>
+        </div>
+    </div>
+    
+            <div class="panel">
+                <dl class="overview-grid">
+                    <div class="overview-item">
+                        <div class="row-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 14h16l-1-5H5z"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></span></div>
+                        <dt>نام پروژه</dt>
+                        <dd>سنجه — اپلیکیشن تخمین قیمت و تحلیل بازار خودرو</dd>
+                    </div>
+                    <div class="overview-item">
+                        <div class="row-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18"/><path d="M7 8c0-3 10-3 10 0s-10 3-10 6 10 3 10 6-10 3-10 0"/></svg></span></div>
+                        <dt>هدف پروژه</dt>
+                        <dd>ایجاد زیرساخت کامل اندازه‌گیری و اتریبیوشن برای اپلیکیشن تخمین قیمت خودرو، به‌همراه آمادگی انتشار در استورهای داخلی و ساختار گزارش‌دهی مدیریتی</dd>
+                    </div>
+                    <div class="overview-item">
+                        <div class="row-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V5M10 19V11M15 19V8M20 19V14"/></svg></span></div>
+                        <dt>شرح کوتاه</dt>
+                        <dd class="lead">پروژه سنجه بر پایه همکاری با تیم فنی و ابزارهای متریکس و متابیس، مسیر اندازه‌گیری را از طراحی Measurement Plan تا پیاده‌سازی Event Tracking، انتشار در مایکت و کافه‌بازار، و طراحی ساختار Attribution و داشبوردها تعریف می‌کند. خروجی نهایی، مجموعه‌ای از مستندات، چک‌لیست‌ها و ساختارهای قابل اجرا برای لانچ است — نه گزارش عملکرد دوره‌ای.</dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+
+        <section id="objectives">
+            
+    <div class="section-head">
+        <div class="section-icon-wrap"><span class="icon-svg section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span></div>
+        <div>
+            <p class="section-number">۰۲</p>
+            <h2 class="section-title">Project Objectives</h2>
+        </div>
+    </div>
+    
+            <div class="panel">
+                <ul class="item-list"><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 18V6l8 4 8-4v12"/><path d="M12 10v8"/></svg></span></span><span class="item-text">آماده‌سازی زیرساخت اتریبیوشن</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h4l2-6 4 12 2-6h4"/></svg></span></span><span class="item-text">پیاده‌سازی ایونت‌ها</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="8" width="14" height="12" rx="2"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></span></span><span class="item-text">انتشار اپ در استورها</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19V5M10 19V11M15 19V8M20 19V14"/></svg></span></span><span class="item-text">ایجاد ساختار گزارش‌دهی</span></li></ul>
+            </div>
+        </section>
+
+        <section id="scope">
+            
+    <div class="section-head">
+        <div class="section-icon-wrap"><span class="icon-svg section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 9h8M8 13h8M8 17h5"/></svg></span></div>
+        <div>
+            <p class="section-number">۰۳</p>
+            <h2 class="section-title">Scope of Work</h2>
+        </div>
+    </div>
+    
+            <div class="panel">
+                <ul class="item-list"><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M3 19c0-3 3-5 5-5s5 2 5 2M11 19c0-3 3-5 5-5s5 2 5 2"/></svg></span></span><span class="item-text">جلسات با متریکس</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h12v16H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span></span><span class="item-text">طراحی Measurement Plan</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4l7 7-3 9 9-3 7 7"/></svg></span></span><span class="item-text">طراحی و پیاده‌سازی Event Tracking</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M10 18h4"/></svg></span></span><span class="item-text">انتشار در مایکت و کافه‌بازار</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M3 16l4-4 4 4 4-5 6 7"/></svg></span></span><span class="item-text">آماده‌سازی محتوای استورها</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="5" rx="1"/><rect x="13" y="10" width="8" height="11" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg></span></span><span class="item-text">طراحی Attribution در متابیس</span></li></ul>
+            </div>
+        </section>
+
+        <section id="deliverables">
+            
+    <div class="section-head">
+        <div class="section-icon-wrap"><span class="icon-svg section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/><path d="M14 4v6h6"/></svg></span></div>
+        <div>
+            <p class="section-number">۰۴</p>
+            <h2 class="section-title">Deliverables</h2>
+        </div>
+    </div>
+    
+            <div class="deliverables-grid"><div class="deliverable-card"><div class="deliverable-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 4h10v16H7z"/><path d="M10 8h4M10 12h4M10 16h2"/></svg></span></div><span>Event Tracking Plan</span></div><div class="deliverable-card"><div class="deliverable-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 18l4-8 4 5 6-11"/></svg></span></div><span>Attribution Structure</span></div><div class="deliverable-card"><div class="deliverable-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 6l2 12h10l2-12"/><path d="M9 6h6"/></svg></span></div><span>Store Assets Checklist</span></div><div class="deliverable-card"><div class="deliverable-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/></svg></span></div><span>Metabase Dashboard Structure</span></div><div class="deliverable-card"><div class="deliverable-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 14H4z"/><path d="M12 10v4"/></svg></span></div><span>Launch Readiness Checklist</span></div></div>
+        </section>
+
+        <section id="dependencies">
+            
+    <div class="section-head">
+        <div class="section-icon-wrap"><span class="icon-svg section-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM16 20a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M10.5 10.5l3 3"/></svg></span></div>
+        <div>
+            <p class="section-number">۰۵</p>
+            <h2 class="section-title">Dependencies & Requirements</h2>
+        </div>
+    </div>
+    
+            <div class="panel">
+                <ul class="item-list"><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2"/><path d="M4 19c0-3 2-5 5-5M14 19c0-2 2-4 4-4"/></svg></span></span><span class="item-text">همکاری تیم فنی</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="8"/></svg></span></span><span class="item-text">دسترسی به متریکس</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16v10H4z"/><path d="M8 11h8M8 15h5"/></svg></span></span><span class="item-text">دسترسی به متابیس</span></li><li><span class="item-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></span></span><span class="item-text">محتوای مورد نیاز استورها</span></li></ul>
+            </div>
+            <div class="requirements-note">
+                <span class="note-icon"><span class="icon-svg" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM16 20a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M10.5 10.5l3 3"/></svg></span></span>
+                <span>پیش‌شرط شروع فازهای اجرایی، تأمین موارد فوق توسط ذی‌نفعان مرتبط است. تا زمان فراهم شدن وابستگی‌ها، خروجی‌ها در قالب مستند و چک‌لیست تعریف می‌شوند.</span>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        <span class="footer-brand"><span class="icon-svg footer-logo" aria-hidden="true">
+    <svg class="logo-mark" viewBox="0 0 48 48" aria-hidden="true">
+      <path d="M8 32 L24 8 L28 16 L16 32 Z" fill="#26C6DA"/>
+      <path d="M20 40 L40 16 L36 8 L24 32 Z" fill="#2196F3"/>
+    </svg>
+    </span> سنجه — Project Overview</span>
+        <span>سند پیش‌آغاز · بدون گزارش وضعیت یا عملکرد</span>
+    </footer>
+
+</div>
+
+</body>
+</html>

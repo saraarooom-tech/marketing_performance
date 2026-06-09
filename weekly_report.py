@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 # =========================
 # Config
 # =========================
-OTP_TARGET = 19000
+OTP_TARGET = 22000
 
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
