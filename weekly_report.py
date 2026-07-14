@@ -1,3 +1,4 @@
+import json
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
@@ -18,6 +19,7 @@ DATA_DIR = BASE_DIR / "data"
 
 CURRENT_PATH = DATA_DIR / "current_week.csv"
 PREVIOUS_PATH = DATA_DIR / "previous_week.csv"
+AI_VERIFIED_PATH = BASE_DIR / "ai_verified_count.csv"
 
 OUTPUT_HTML = BASE_DIR / "weekly_report.html"
 
@@ -690,6 +692,53 @@ current_week_table_html = make_current_week_table()
 
 
 # =========================
+# Total Verified QR (daily)
+# =========================
+def read_verified_qr_data():
+    if not AI_VERIFIED_PATH.exists():
+        return []
+
+    try:
+        df = pd.read_csv(AI_VERIFIED_PATH, encoding="utf-8-sig")
+    except UnicodeDecodeError:
+        df = pd.read_csv(AI_VERIFIED_PATH, encoding="latin1")
+
+    df.columns = df.columns.str.strip()
+    df["day"] = pd.to_datetime(df["day"], format="%d-%b-%y", errors="coerce")
+    df = df.dropna(subset=["day"])
+
+    for col in ["otp_verified_count", "ai_verified_count", "manual_verified_count"]:
+        if col not in df.columns:
+            df[col] = 0
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(0).astype(int)
+
+    df["total_verified_qr"] = (
+        df["otp_verified_count"]
+        + df["ai_verified_count"]
+        + df["manual_verified_count"]
+    )
+
+    df = df.sort_values("day", ascending=True)
+
+    records = []
+    for _, row in df.iterrows():
+        records.append({
+            "day": row["day"].strftime("%Y-%m-%d"),
+            "day_label": row["day"].strftime("%d %b %Y"),
+            "otp": int(row["otp_verified_count"]),
+            "ai": int(row["ai_verified_count"]),
+            "manual": int(row["manual_verified_count"]),
+            "total": int(row["total_verified_qr"]),
+        })
+
+    return records
+
+
+verified_qr_data = read_verified_qr_data()
+verified_qr_json = json.dumps(verified_qr_data, ensure_ascii=False)
+
+
+# =========================
 # Build HTML
 # =========================
 generated_at = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -700,6 +749,7 @@ html = f"""
 <head>
 <meta charset="UTF-8">
 <title>Marketing Performance Weekly Report</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <style>
     * {{
@@ -1263,6 +1313,214 @@ html = f"""
         background: rgba(255,122,0,0.08);
     }}
 
+    /* =========================
+       Total Verified QR Tab
+    ========================= */
+    .vqr-filters {{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        align-items: flex-end;
+        margin-bottom: 22px;
+    }}
+
+    .vqr-filter-group {{
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }}
+
+    .vqr-filter-group label {{
+        font-size: 12px;
+        color: #b8b8b8;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }}
+
+    .vqr-filter-group input[type="date"],
+    .vqr-filter-group select {{
+        background: #171717;
+        border: 1px solid #555555;
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 14px;
+        min-width: 190px;
+        color-scheme: dark;
+    }}
+
+    .vqr-filter-group input[type="date"]:focus,
+    .vqr-filter-group select:focus {{
+        outline: none;
+        border-color: #ff7a00;
+        box-shadow: 0 0 0 2px rgba(255,122,0,0.2);
+    }}
+
+    .vqr-filter-group input[type="date"]::-webkit-calendar-picker-indicator {{
+        filter: invert(1);
+        cursor: pointer;
+    }}
+
+    .vqr-apply-btn {{
+        background: linear-gradient(135deg, #ff7a00 0%, #d96c00 100%);
+        border: none;
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 11px 18px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        min-width: 120px;
+    }}
+
+    .vqr-apply-btn:hover {{
+        filter: brightness(1.05);
+    }}
+
+    .vqr-range-note {{
+        width: 100%;
+        font-size: 13px;
+        color: #b8b8b8;
+        margin-top: -6px;
+        margin-bottom: 6px;
+    }}
+
+    .vqr-range-note strong {{
+        color: #ff9a3d;
+    }}
+
+    .vqr-presets {{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }}
+
+    .vqr-preset-btn {{
+        background: #252525;
+        border: 1px solid #444444;
+        color: #dddddd;
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }}
+
+    .vqr-preset-btn:hover,
+    .vqr-preset-btn.active {{
+        background: rgba(255,122,0,0.18);
+        border-color: #ff7a00;
+        color: #ff9a3d;
+    }}
+
+    .vqr-summary {{
+        display: grid;
+        grid-template-columns: 1.4fr repeat(3, 1fr);
+        gap: 16px;
+        margin-bottom: 24px;
+    }}
+
+    .vqr-card {{
+        background: linear-gradient(180deg, #1f1f1f 0%, #171717 100%);
+        border: 1px solid #333333;
+        border-radius: 18px;
+        padding: 18px 20px;
+    }}
+
+    .vqr-card.hero {{
+        border-color: #ff7a00;
+        box-shadow: 0 0 0 1px rgba(255,122,0,0.25), 0 12px 30px rgba(255,122,0,0.12);
+        background: linear-gradient(135deg, rgba(255,122,0,0.16) 0%, #1a1a1a 55%, #141414 100%);
+    }}
+
+    .vqr-card-label {{
+        font-size: 12px;
+        color: #b8b8b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+    }}
+
+    .vqr-card.hero .vqr-card-label {{
+        color: #ff9a3d;
+        font-weight: bold;
+    }}
+
+    .vqr-card-value {{
+        font-size: 28px;
+        font-weight: bold;
+        color: #ffffff;
+        line-height: 1.1;
+    }}
+
+    .vqr-card.hero .vqr-card-value {{
+        font-size: 42px;
+        color: #ff9a3d;
+    }}
+
+    .vqr-card-sub {{
+        margin-top: 8px;
+        font-size: 12px;
+        color: #888888;
+    }}
+
+    .vqr-charts {{
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 18px;
+        margin-bottom: 22px;
+    }}
+
+    .vqr-chart-panel {{
+        min-height: 340px;
+        padding: 18px;
+    }}
+
+    .vqr-chart-title {{
+        font-size: 14px;
+        color: #ff9a3d;
+        margin-bottom: 12px;
+        font-weight: bold;
+    }}
+
+    .vqr-chart-canvas {{
+        position: relative;
+        height: 280px;
+    }}
+
+    .vqr-table-wrap {{
+        max-height: 420px;
+        overflow: auto;
+        border-radius: 12px;
+        border: 1px solid #333333;
+    }}
+
+    .vqr-table .total-row td {{
+        background: rgba(255,122,0,0.14);
+        color: #ff9a3d;
+        font-weight: bold;
+        border-top: 2px solid #ff7a00;
+    }}
+
+    .vqr-table .col-total {{
+        color: #ff9a3d;
+        font-weight: bold;
+    }}
+
+    .vqr-formula {{
+        margin-bottom: 18px;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: rgba(255,122,0,0.08);
+        border: 1px solid rgba(255,122,0,0.25);
+        color: #dddddd;
+        font-size: 13px;
+    }}
+
+    .vqr-formula strong {{
+        color: #ff9a3d;
+    }}
+
     .footer {{
         margin-top: 28px;
         padding-top: 18px;
@@ -1305,6 +1563,14 @@ html = f"""
         .tab-button {{
             width: 100%;
         }}
+
+        .vqr-summary {{
+            grid-template-columns: 1fr;
+        }}
+
+        .vqr-charts {{
+            grid-template-columns: 1fr;
+        }}
     }}
 </style>
 </head>
@@ -1333,6 +1599,10 @@ html = f"""
                     Funnel Performance
                 </button>
 
+                <button class="tab-button" onclick="openTab(event, 'verified-qr-tab')">
+                    Total Verified QR
+                </button>
+
                 <button class="tab-button" onclick="openTab(event, 'channel-tab')">
                     Channel Split
                 </button>
@@ -1351,6 +1621,112 @@ html = f"""
                 <div class="panel">
                     <div class="table-wrapper">
                         {funnel_table_html}
+                    </div>
+                </div>
+            </div>
+
+            <div id="verified-qr-tab" class="tab-content">
+                <div class="tab-section-title">Total Verified QR</div>
+                <div class="tab-section-subtitle">
+                    Daily breakdown from ai_verified_count.csv. Filter by date range to explore trends.
+                </div>
+
+                <div class="vqr-formula">
+                    <strong>Total Verified QR</strong> =
+                    OTP Verified Count + AI Verified Count + Manual Verified Count
+                </div>
+
+                <div class="vqr-filters">
+                    <div class="vqr-filter-group">
+                        <label for="vqr-date-from">From</label>
+                        <input type="date" id="vqr-date-from">
+                        <select id="vqr-date-from-select" aria-label="Select start date"></select>
+                    </div>
+                    <div class="vqr-filter-group">
+                        <label for="vqr-date-to">To</label>
+                        <input type="date" id="vqr-date-to">
+                        <select id="vqr-date-to-select" aria-label="Select end date"></select>
+                    </div>
+                    <div class="vqr-filter-group">
+                        <label>&nbsp;</label>
+                        <button type="button" class="vqr-apply-btn" id="vqr-apply-btn">Apply Range</button>
+                    </div>
+                    <div class="vqr-filter-group">
+                        <label>Quick Range</label>
+                        <div class="vqr-presets">
+                            <button class="vqr-preset-btn" data-range="custom">Custom</button>
+                            <button class="vqr-preset-btn active" data-range="all">All</button>
+                            <button class="vqr-preset-btn" data-range="sat-yesterday">Sat → Yesterday</button>
+                            <button class="vqr-preset-btn" data-range="7">Last 7 Days</button>
+                            <button class="vqr-preset-btn" data-range="14">Last 14 Days</button>
+                            <button class="vqr-preset-btn" data-range="cw">Current Week</button>
+                            <button class="vqr-preset-btn" data-range="pw">Previous Week</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="vqr-range-note" id="vqr-range-note">
+                    Selected range: <strong>-</strong>
+                </div>
+
+                <div class="vqr-summary">
+                    <div class="vqr-card hero">
+                        <div class="vqr-card-label">Total Verified QR</div>
+                        <div class="vqr-card-value" id="vqr-total-sum">0</div>
+                        <div class="vqr-card-sub" id="vqr-total-days">0 days selected</div>
+                    </div>
+                    <div class="vqr-card">
+                        <div class="vqr-card-label">OTP Verified</div>
+                        <div class="vqr-card-value" id="vqr-otp-sum">0</div>
+                        <div class="vqr-card-sub" id="vqr-otp-share">0% of total</div>
+                    </div>
+                    <div class="vqr-card">
+                        <div class="vqr-card-label">AI Verified</div>
+                        <div class="vqr-card-value" id="vqr-ai-sum">0</div>
+                        <div class="vqr-card-sub" id="vqr-ai-share">0% of total</div>
+                    </div>
+                    <div class="vqr-card">
+                        <div class="vqr-card-label">Manual Verified</div>
+                        <div class="vqr-card-value" id="vqr-manual-sum">0</div>
+                        <div class="vqr-card-sub" id="vqr-manual-share">0% of total</div>
+                    </div>
+                </div>
+
+                <div class="vqr-charts">
+                    <div class="panel vqr-chart-panel">
+                        <div class="vqr-chart-title">Daily Trend</div>
+                        <div class="vqr-chart-canvas">
+                            <canvas id="vqr-line-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="panel vqr-chart-panel">
+                        <div class="vqr-chart-title">Composition Share</div>
+                        <div class="vqr-chart-canvas">
+                            <canvas id="vqr-donut-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="panel vqr-chart-panel" style="grid-column: 1 / -1;">
+                        <div class="vqr-chart-title">Daily Stacked Breakdown</div>
+                        <div class="vqr-chart-canvas">
+                            <canvas id="vqr-stacked-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="vqr-table-wrap">
+                        <table class="standard-table vqr-table" id="vqr-table">
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>OTP Verified</th>
+                                    <th>AI Verified</th>
+                                    <th>Manual Verified</th>
+                                    <th>Total Verified QR</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vqr-table-body"></tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -1410,6 +1786,449 @@ html = f"""
         document.getElementById(tabId).classList.add('active');
         event.currentTarget.classList.add('active');
     }}
+
+    const verifiedQrData = {verified_qr_json};
+
+    function formatVqrNumber(value) {{
+        return Number(value || 0).toLocaleString('en-US');
+    }}
+
+    function formatVqrPercent(value) {{
+        return `${{Number(value || 0).toFixed(1)}}%`;
+    }}
+
+    function parseVqrDate(value) {{
+        return new Date(`${{value}}T00:00:00`);
+    }}
+
+    function toVqrDateString(date) {{
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${{year}}-${{month}}-${{day}}`;
+    }}
+
+    function clampVqrDate(date, minValue, maxValue) {{
+        const minDate = parseVqrDate(minValue);
+        const maxDate = parseVqrDate(maxValue);
+        if (date < minDate) return minDate;
+        if (date > maxDate) return maxDate;
+        return date;
+    }}
+
+    function getVqrLabel(value) {{
+        const row = verifiedQrData.find(item => item.day === value);
+        return row ? row.day_label : value;
+    }}
+
+    function getLastSaturdayOnOrBefore(date) {{
+        const result = new Date(date);
+        const daysSinceSaturday = (result.getDay() + 1) % 7;
+        result.setDate(result.getDate() - daysSinceSaturday);
+        return result;
+    }}
+
+    function getVqrBounds() {{
+        if (!verifiedQrData.length) {{
+            return {{ min: null, max: null }};
+        }}
+
+        const days = verifiedQrData.map(row => row.day).sort();
+        return {{
+            min: days[0],
+            max: days[days.length - 1],
+        }};
+    }}
+
+    function filterVqrData(fromValue, toValue) {{
+        const fromDate = fromValue ? parseVqrDate(fromValue) : null;
+        const toDate = toValue ? parseVqrDate(toValue) : null;
+
+        return verifiedQrData.filter(row => {{
+            const day = parseVqrDate(row.day);
+            if (fromDate && day < fromDate) return false;
+            if (toDate && day > toDate) return false;
+            return true;
+        }});
+    }}
+
+    function sumVqrField(rows, field) {{
+        return rows.reduce((sum, row) => sum + Number(row[field] || 0), 0);
+    }}
+
+    function setVqrPresetActive(range) {{
+        document.querySelectorAll('.vqr-preset-btn').forEach(button => {{
+            button.classList.toggle('active', button.dataset.range === range);
+        }});
+    }}
+
+    function setVqrRange(fromValue, toValue, preset = 'custom') {{
+        const bounds = getVqrBounds();
+        if (!bounds.min || !bounds.max) {{
+            return;
+        }}
+
+        let fromDate = parseVqrDate(fromValue);
+        let toDate = parseVqrDate(toValue);
+
+        if (fromDate > toDate) {{
+            [fromDate, toDate] = [toDate, fromDate];
+        }}
+
+        fromDate = clampVqrDate(fromDate, bounds.min, bounds.max);
+        toDate = clampVqrDate(toDate, bounds.min, bounds.max);
+
+        const fromInput = document.getElementById('vqr-date-from');
+        const toInput = document.getElementById('vqr-date-to');
+        const fromSelect = document.getElementById('vqr-date-from-select');
+        const toSelect = document.getElementById('vqr-date-to-select');
+
+        const fromString = toVqrDateString(fromDate);
+        const toString = toVqrDateString(toDate);
+
+        fromInput.value = fromString;
+        toInput.value = toString;
+        fromSelect.value = fromString;
+        toSelect.value = toString;
+
+        fromInput.min = bounds.min;
+        fromInput.max = toString;
+        toInput.min = fromString;
+        toInput.max = bounds.max;
+
+        setVqrPresetActive(preset);
+        updateVerifiedQrTab();
+    }}
+
+    function applyVqrPreset(range) {{
+        const bounds = getVqrBounds();
+        if (!bounds.min || !bounds.max) {{
+            return;
+        }}
+
+        const maxDate = parseVqrDate(bounds.max);
+        let fromDate = parseVqrDate(bounds.min);
+        let toDate = new Date(maxDate);
+
+        if (range === 'sat-yesterday') {{
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+
+            toDate = clampVqrDate(yesterday, bounds.min, bounds.max);
+            fromDate = getLastSaturdayOnOrBefore(toDate);
+            fromDate = clampVqrDate(fromDate, bounds.min, bounds.max);
+        }} else if (range === '7') {{
+            fromDate = new Date(maxDate);
+            fromDate.setDate(fromDate.getDate() - 6);
+        }} else if (range === '14') {{
+            fromDate = new Date(maxDate);
+            fromDate.setDate(fromDate.getDate() - 13);
+        }} else if (range === 'cw') {{
+            fromDate = new Date(maxDate);
+            fromDate.setDate(fromDate.getDate() - 6);
+        }} else if (range === 'pw') {{
+            toDate = new Date(maxDate);
+            toDate.setDate(toDate.getDate() - 7);
+            fromDate = new Date(toDate);
+            fromDate.setDate(fromDate.getDate() - 6);
+        }}
+
+        const minDate = parseVqrDate(bounds.min);
+        if (fromDate < minDate) {{
+            fromDate = minDate;
+        }}
+        if (toDate > maxDate) {{
+            toDate = maxDate;
+        }}
+
+        setVqrRange(toVqrDateString(fromDate), toVqrDateString(toDate), range);
+    }}
+
+    let vqrLineChart = null;
+    let vqrDonutChart = null;
+    let vqrStackedChart = null;
+
+    function renderVqrSummary(rows) {{
+        const total = sumVqrField(rows, 'total');
+        const otp = sumVqrField(rows, 'otp');
+        const ai = sumVqrField(rows, 'ai');
+        const manual = sumVqrField(rows, 'manual');
+
+        document.getElementById('vqr-total-sum').textContent = formatVqrNumber(total);
+        document.getElementById('vqr-total-days').textContent = `${{rows.length}} day${{rows.length === 1 ? '' : 's'}} selected`;
+        document.getElementById('vqr-otp-sum').textContent = formatVqrNumber(otp);
+        document.getElementById('vqr-ai-sum').textContent = formatVqrNumber(ai);
+        document.getElementById('vqr-manual-sum').textContent = formatVqrNumber(manual);
+        document.getElementById('vqr-otp-share').textContent = `${{formatVqrPercent(total ? otp / total * 100 : 0)}} of total`;
+        document.getElementById('vqr-ai-share').textContent = `${{formatVqrPercent(total ? ai / total * 100 : 0)}} of total`;
+        document.getElementById('vqr-manual-share').textContent = `${{formatVqrPercent(total ? manual / total * 100 : 0)}} of total`;
+    }}
+
+    function renderVqrTable(rows) {{
+        const tbody = document.getElementById('vqr-table-body');
+        tbody.innerHTML = '';
+
+        const sortedRows = [...rows].sort((a, b) => parseVqrDate(b.day) - parseVqrDate(a.day));
+
+        sortedRows.forEach(row => {{
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${{row.day_label}}</td>
+                <td>${{formatVqrNumber(row.otp)}}</td>
+                <td>${{formatVqrNumber(row.ai)}}</td>
+                <td>${{formatVqrNumber(row.manual)}}</td>
+                <td class="col-total">${{formatVqrNumber(row.total)}}</td>
+            `;
+            tbody.appendChild(tr);
+        }});
+
+        if (sortedRows.length) {{
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'total-row';
+            totalRow.innerHTML = `
+                <td>Total</td>
+                <td>${{formatVqrNumber(sumVqrField(sortedRows, 'otp'))}}</td>
+                <td>${{formatVqrNumber(sumVqrField(sortedRows, 'ai'))}}</td>
+                <td>${{formatVqrNumber(sumVqrField(sortedRows, 'manual'))}}</td>
+                <td class="col-total">${{formatVqrNumber(sumVqrField(sortedRows, 'total'))}}</td>
+            `;
+            tbody.appendChild(totalRow);
+        }}
+    }}
+
+    function renderVqrCharts(rows) {{
+        const labels = rows.map(row => row.day_label);
+        const otpValues = rows.map(row => row.otp);
+        const aiValues = rows.map(row => row.ai);
+        const manualValues = rows.map(row => row.manual);
+        const totalValues = rows.map(row => row.total);
+
+        const chartDefaults = {{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {{
+                legend: {{
+                    labels: {{
+                        color: '#dddddd',
+                    }},
+                }},
+            }},
+            scales: {{
+                x: {{
+                    ticks: {{ color: '#bbbbbb' }},
+                    grid: {{ color: 'rgba(255,255,255,0.06)' }},
+                }},
+                y: {{
+                    ticks: {{ color: '#bbbbbb' }},
+                    grid: {{ color: 'rgba(255,255,255,0.06)' }},
+                }},
+            }},
+        }};
+
+        if (vqrLineChart) vqrLineChart.destroy();
+        if (vqrDonutChart) vqrDonutChart.destroy();
+        if (vqrStackedChart) vqrStackedChart.destroy();
+
+        const lineCtx = document.getElementById('vqr-line-chart');
+        vqrLineChart = new Chart(lineCtx, {{
+            type: 'line',
+            data: {{
+                labels,
+                datasets: [
+                    {{
+                        label: 'OTP Verified',
+                        data: otpValues,
+                        borderColor: '#9E9E9E',
+                        backgroundColor: 'rgba(158,158,158,0.15)',
+                        tension: 0.25,
+                    }},
+                    {{
+                        label: 'AI Verified',
+                        data: aiValues,
+                        borderColor: '#4FC3F7',
+                        backgroundColor: 'rgba(79,195,247,0.15)',
+                        tension: 0.25,
+                    }},
+                    {{
+                        label: 'Manual Verified',
+                        data: manualValues,
+                        borderColor: '#81C784',
+                        backgroundColor: 'rgba(129,199,132,0.15)',
+                        tension: 0.25,
+                    }},
+                    {{
+                        label: 'Total Verified QR',
+                        data: totalValues,
+                        borderColor: '#FF7A00',
+                        backgroundColor: 'rgba(255,122,0,0.18)',
+                        borderWidth: 4,
+                        pointRadius: 4,
+                        tension: 0.25,
+                    }},
+                ],
+            }},
+            options: chartDefaults,
+        }});
+
+        const donutCtx = document.getElementById('vqr-donut-chart');
+        const otpTotal = sumVqrField(rows, 'otp');
+        const aiTotal = sumVqrField(rows, 'ai');
+        const manualTotal = sumVqrField(rows, 'manual');
+
+        vqrDonutChart = new Chart(donutCtx, {{
+            type: 'doughnut',
+            data: {{
+                labels: ['OTP Verified', 'AI Verified', 'Manual Verified'],
+                datasets: [{{
+                    data: [otpTotal, aiTotal, manualTotal],
+                    backgroundColor: ['#9E9E9E', '#4FC3F7', '#81C784'],
+                    borderColor: '#171717',
+                    borderWidth: 2,
+                }}],
+            }},
+            options: {{
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {{
+                    legend: {{
+                        position: 'bottom',
+                        labels: {{ color: '#dddddd' }},
+                    }},
+                }},
+            }},
+        }});
+
+        const stackedCtx = document.getElementById('vqr-stacked-chart');
+        vqrStackedChart = new Chart(stackedCtx, {{
+            type: 'bar',
+            data: {{
+                labels,
+                datasets: [
+                    {{
+                        label: 'OTP Verified',
+                        data: otpValues,
+                        backgroundColor: '#9E9E9E',
+                        stack: 'verified',
+                    }},
+                    {{
+                        label: 'AI Verified',
+                        data: aiValues,
+                        backgroundColor: '#4FC3F7',
+                        stack: 'verified',
+                    }},
+                    {{
+                        label: 'Manual Verified',
+                        data: manualValues,
+                        backgroundColor: '#81C784',
+                        stack: 'verified',
+                    }},
+                ],
+            }},
+            options: {{
+                ...chartDefaults,
+                scales: {{
+                    x: {{
+                        stacked: true,
+                        ticks: {{ color: '#bbbbbb' }},
+                        grid: {{ color: 'rgba(255,255,255,0.06)' }},
+                    }},
+                    y: {{
+                        stacked: true,
+                        ticks: {{ color: '#bbbbbb' }},
+                        grid: {{ color: 'rgba(255,255,255,0.06)' }},
+                    }},
+                }},
+            }},
+        }});
+    }}
+
+    function updateVerifiedQrTab() {{
+        const fromValue = document.getElementById('vqr-date-from').value;
+        const toValue = document.getElementById('vqr-date-to').value;
+        const rows = filterVqrData(fromValue, toValue);
+
+        document.getElementById('vqr-range-note').innerHTML =
+            `Selected range: <strong>${{getVqrLabel(fromValue)}} → ${{getVqrLabel(toValue)}}</strong> (${{rows.length}} day${{rows.length === 1 ? '' : 's'}})`;
+
+        renderVqrSummary(rows);
+        renderVqrTable(rows);
+        renderVqrCharts(rows);
+    }}
+
+    function populateVqrDateSelects() {{
+        const fromSelect = document.getElementById('vqr-date-from-select');
+        const toSelect = document.getElementById('vqr-date-to-select');
+        const sortedRows = [...verifiedQrData].sort((a, b) => parseVqrDate(a.day) - parseVqrDate(b.day));
+
+        fromSelect.innerHTML = '';
+        toSelect.innerHTML = '';
+
+        sortedRows.forEach(row => {{
+            const fromOption = document.createElement('option');
+            fromOption.value = row.day;
+            fromOption.textContent = row.day_label;
+            fromSelect.appendChild(fromOption);
+
+            const toOption = document.createElement('option');
+            toOption.value = row.day;
+            toOption.textContent = row.day_label;
+            toSelect.appendChild(toOption);
+        }});
+    }}
+
+    function initVerifiedQrTab() {{
+        if (!verifiedQrData.length) {{
+            return;
+        }}
+
+        populateVqrDateSelects();
+
+        const bounds = getVqrBounds();
+        const fromInput = document.getElementById('vqr-date-from');
+        const toInput = document.getElementById('vqr-date-to');
+        const fromSelect = document.getElementById('vqr-date-from-select');
+        const toSelect = document.getElementById('vqr-date-to-select');
+        const applyBtn = document.getElementById('vqr-apply-btn');
+
+        setVqrRange(bounds.min, bounds.max, 'all');
+
+        function syncFromManualSelection() {{
+            setVqrRange(fromInput.value, toInput.value, 'custom');
+        }}
+
+        fromInput.addEventListener('change', syncFromManualSelection);
+        toInput.addEventListener('change', syncFromManualSelection);
+        fromInput.addEventListener('input', () => setVqrPresetActive('custom'));
+        toInput.addEventListener('input', () => setVqrPresetActive('custom'));
+
+        fromSelect.addEventListener('change', () => {{
+            setVqrRange(fromSelect.value, toSelect.value, 'custom');
+        }});
+
+        toSelect.addEventListener('change', () => {{
+            setVqrRange(fromSelect.value, toSelect.value, 'custom');
+        }});
+
+        applyBtn.addEventListener('click', () => {{
+            setVqrRange(fromInput.value || fromSelect.value, toInput.value || toSelect.value, 'custom');
+        }});
+
+        document.querySelectorAll('.vqr-preset-btn').forEach(button => {{
+            button.addEventListener('click', () => {{
+                if (button.dataset.range === 'custom') {{
+                    fromInput.focus();
+                    setVqrPresetActive('custom');
+                    return;
+                }}
+                applyVqrPreset(button.dataset.range);
+            }});
+        }});
+    }}
+
+    document.addEventListener('DOMContentLoaded', initVerifiedQrTab);
 </script>
 
 </body>
