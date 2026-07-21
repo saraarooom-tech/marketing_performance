@@ -1,4 +1,5 @@
 {
+    "buildCommand": "python seo/seo_weekly_report.py",
     "builds": [
       {
         "src": "api/index.py",

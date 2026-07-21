@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>گزارش هفتگی SEO</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        background:
+            radial-gradient(circle at top left, rgba(255,122,0,0.12), transparent 30%),
+            radial-gradient(circle at bottom right, rgba(0,212,255,0.08), transparent 32%),
+            linear-gradient(135deg, #0f0f0f 0%, #191919 48%, #0b0b0b 100%);
+        color: #fff;
+        font-family: Tahoma, Arial, sans-serif;
+    }
+    .page {
+        width: 95%;
+        max-width: 1680px;
+        margin: 34px auto;
+        background: linear-gradient(135deg, #202020 0%, #181818 52%, #121212 100%);
+        border: 1px solid #333;
+        border-radius: 30px;
+        padding: 34px;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.48);
+    }
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 4px solid #ff7a00;
+        padding-bottom: 22px;
+        margin-bottom: 24px;
+        gap: 24px;
+    }
+    .header h1 { margin: 0; font-size: 34px; }
+    .header p { margin: 8px 0 0; color: #b8b8b8; font-size: 14px; }
+    .badge {
+        background: linear-gradient(135deg, #2f2f2f, #1d1d1d);
+        color: #ff9a3d;
+        border: 1px solid #ff7a00;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+    .section-label {
+        color: #ff9a3d;
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        letter-spacing: 0.4px;
+    }
+    .filters {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 18px;
+    }
+    .sc-filters {
+        grid-template-columns: 1fr 1fr;
+        margin-bottom: 12px;
+    }
+    .filter-group label {
+        display: block;
+        color: #aeb0b8;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+    .filter-group select,
+    .filter-group input {
+        width: 100%;
+        background: #171717;
+        border: 1px solid #555;
+        color: #fff;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-size: 14px;
+    }
+    .compare-note {
+        margin: 0 0 18px;
+        color: #aeb0b8;
+        font-size: 13px;
+    }
+    .compare-note strong { color: #ff9a3d; }
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+    .metric-card {
+        min-height: 190px;
+        background: linear-gradient(135deg, #34363d 0%, #24262d 48%, #17181d 100%);
+        border-radius: 18px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: 0 14px 30px rgba(0,0,0,0.38);
+    }
+    .metric-card::before {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 7px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--accent-color), rgba(255,255,255,0.35));
+    }
+    .metric-top-line {
+        height: 5px;
+        background: linear-gradient(90deg, var(--accent-color), rgba(255,255,255,0.08));
+    }
+    .metric-title { padding: 20px 18px 0; color: #cfd0d5; font-size: 14px; font-weight: bold; }
+    .metric-value { padding: 10px 18px 0; font-size: 30px; font-weight: bold; }
+    .metric-delta { padding: 5px 18px 0; font-size: 12px; font-weight: bold; }
+    .metric-visual {
+        position: absolute;
+        top: 22px;
+        left: 16px;
+        width: 76px;
+        padding: 8px;
+        border-radius: 14px;
+        background: rgba(0,0,0,0.22);
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+    .mini-label { color: #aeb0b8; font-size: 9px; font-weight: bold; margin-bottom: 6px; text-align: center; }
+    .bar-row { display: grid; grid-template-columns: 22px 1fr; gap: 5px; margin-bottom: 5px; align-items: center; }
+    .bar-row span { color: #bfc1ca; font-size: 9px; font-weight: bold; }
+    .mini-track { height: 6px; border-radius: 999px; background: #343844; overflow: hidden; }
+    .mini-fill { height: 100%; border-radius: 999px; }
+    .mini-fill.previous { background: linear-gradient(90deg, #7d8294, #c1c4cf); }
+    .positive { color: #00ff84 !important; }
+    .negative { color: #ffb083 !important; }
+    .neutral { color: #d0d0d0 !important; }
+    .sc-trend-panel {
+        margin-bottom: 28px;
+        background: linear-gradient(135deg, #1d1d1d, #151515);
+        border: 1px solid #333;
+        border-radius: 18px;
+        padding: 18px;
+    }
+    .sc-trend-title { color: #ff9a3d; font-weight: bold; margin-bottom: 12px; }
+    .chart-canvas-wrap { position: relative; height: 320px; }
+    .tabs-shell {
+        background: linear-gradient(135deg, #24262d 0%, #191a20 100%);
+        border: 1px solid #333743;
+        border-radius: 22px;
+        padding: 14px;
+    }
+    .tabs { display: flex; justify-content: center; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+    .tab-button {
+        min-width: 160px;
+        border: 1px solid rgba(255,255,255,0.08);
+        cursor: pointer;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #343844, #242832);
+        color: #d8d9de;
+        font-weight: bold;
+    }
+    .tab-button.active {
+        background: linear-gradient(135deg, #ff7a00, #d96c00);
+        color: #fff;
+        border-color: #ff9a3d;
+    }
+    .tab-content { display: none; background: linear-gradient(135deg, #1d1f26, #14151a); padding: 24px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.06); }
+    .tab-content.active { display: block; }
+    .tab-section-title { font-size: 22px; font-weight: bold; margin-bottom: 6px; }
+    .tab-section-subtitle { color: #aeb0b8; font-size: 13px; margin-bottom: 18px; }
+    .panel { background: linear-gradient(135deg, #1d1d1d, #151515); border: 1px solid #333; border-radius: 18px; padding: 16px; }
+    .trend-panel { margin-bottom: 18px; }
+    .trend-panel-header { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+    .trend-panel-title { color: #ff9a3d; font-weight: bold; }
+    .trend-panel-note { color: #aeb0b8; font-size: 12px; }
+    .table-wrapper { overflow: auto; border-radius: 16px; max-height: 620px; }
+    .keyword-table, .kpi-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .keyword-table thead, .kpi-table thead { position: sticky; top: 0; z-index: 2; background: #2a2f3a; }
+    .keyword-table th, .keyword-table td, .kpi-table th, .kpi-table td {
+        padding: 12px 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        white-space: nowrap;
+        text-align: center;
+    }
+    .keyword-table .text-keyword, .kpi-table .metric-name { text-align: right; }
+    .change-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 72px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: bold;
+        background: rgba(255,255,255,0.06);
+    }
+    .change-pill.positive { background: rgba(0,255,132,0.10); border: 1px solid rgba(0,255,132,0.28); }
+    .change-pill.negative { background: rgba(255,122,0,0.13); border: 1px solid rgba(255,122,0,0.32); }
+    .bar-cell {
+        position: relative;
+        min-width: 120px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.04);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .bar-cell-fill { position: absolute; right: 0; top: 0; bottom: 0; opacity: 0.28; }
+    .bar-cell span { position: relative; z-index: 1; font-weight: bold; }
+    .category-groups { margin-bottom: 28px; }
+    .keyword-tabs-shell {
+        background: linear-gradient(135deg, #24262d 0%, #191a20 100%);
+        border: 1px solid #333743;
+        border-radius: 22px;
+        padding: 14px;
+    }
+    .keyword-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
+    .keyword-tab-button {
+        min-width: 150px;
+        border: 1px solid rgba(255,255,255,0.08);
+        cursor: pointer;
+        padding: 12px 16px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
+        color: #d8d9de;
+        font-weight: bold;
+        font-size: 13px;
+    }
+    .keyword-tab-button.active {
+        background: linear-gradient(135deg, #ff7a00, #d96c00);
+        color: #fff;
+        border-color: #ff9a3d;
+    }
+    .keyword-panel {
+        background: linear-gradient(135deg, #1d1f26, #14151a);
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 18px;
+        padding: 16px;
+    }
+    .keyword-panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+    }
+    .keyword-panel-title {
+        color: #ff9a3d;
+        font-size: 18px;
+        font-weight: bold;
+    }
+    .keyword-panel-week {
+        color: #aeb0b8;
+        font-size: 13px;
+    }
+    .table-scroll {
+        max-height: 420px;
+        overflow: auto;
+        border-radius: 14px;
+        border: 1px solid #3a3a3a;
+    }
+    .sheet-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .sheet-table thead th {
+        background: linear-gradient(135deg, #3a3a3a, #2d2d2d);
+        color: #ff9a3d;
+        padding: 12px 14px;
+        text-align: center;
+        border-bottom: 2px solid #ff7a00;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+    }
+    .sheet-table thead th.text-col { text-align: right; }
+    .sheet-table tbody td {
+        padding: 11px 14px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        text-align: center;
+        background: rgba(255,255,255,0.02);
+        color: #e8e8e8;
+    }
+    .sheet-table tbody td.text-col {
+        text-align: right;
+        background: rgba(255, 122, 0, 0.06);
+        color: #f5f5f5;
+    }
+    .sheet-table tbody tr:nth-child(even) td {
+        background: rgba(255,255,255,0.03);
+    }
+    .sheet-table tbody tr:nth-child(even) td.text-col {
+        background: rgba(255, 122, 0, 0.09);
+    }
+    .sheet-table tbody tr.total-row td {
+        background: #2a2a2a !important;
+        color: #ff9a3d;
+        font-weight: bold;
+        border-top: 2px solid #ff7a00;
+        position: sticky;
+        bottom: 0;
+    }
+    .sheet-table tbody tr.kw-row {
+        cursor: pointer;
+        transition: background 0.15s ease;
+    }
+    .sheet-table tbody tr.kw-row:hover {
+        background: rgba(255,122,0,0.10) !important;
+    }
+    .sheet-table tbody tr.kw-row.selected td {
+        background: rgba(255,122,0,0.18) !important;
+        box-shadow: inset 3px 0 0 #ff7a00;
+    }
+    .kw-trend-panel {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid #3a3a3a;
+    }
+    .kw-trend-title {
+        color: #ff9a3d;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+    .kw-trend-note {
+        color: #aeb0b8;
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+    .kw-trend-chart-wrap {
+        position: relative;
+        height: 260px;
+    }
+    .kw-trend-filters {
+        grid-template-columns: repeat(3, 1fr);
+        margin-bottom: 14px;
+    }
+    .footer {
+        margin-top: 24px;
+        padding-top: 18px;
+        border-top: 1px solid #333;
+        color: #888;
+        font-size: 13px;
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+    }
+    @media (max-width: 1200px) {
+        .metric-grid, .filters { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 700px) {
+        .metric-grid, .filters { grid-template-columns: 1fr; }
+        .page { padding: 22px; }
+    }
+</style>
+</head>
+<body>
+<div class="page">
+    <div class="header">
+        <div>
+            <h1>گزارش هفتگی SEO</h1>
+        </div>
+        <div class="badge">Generated: 2026-07-21 14:49</div>
+    </div>
+
+    <div class="section-label">Search Console Overview</div>
+    <div class="filters sc-filters">
+        <div class="filter-group">
+            <label for="sc-week-filter">هفته گزارش</label>
+            <select id="sc-week-filter"><option value="W02 [01/08-01/14]">W02 [01/08-01/14]</option><option value="W03 [01/15-01/21]">W03 [01/15-01/21]</option><option value="W04 [01/22-01/28]">W04 [01/22-01/28]</option><option value="W05 [01/29-01/04]">W05 [01/29-01/04]</option><option value="W06 [02/05-02/11]">W06 [02/05-02/11]</option><option value="W07 [02/12-02/18]">W07 [02/12-02/18]</option><option value="W08 [02/19-02/25]">W08 [02/19-02/25]</option><option value="W09 [02/26-02/01]">W09 [02/26-02/01]</option><option value="W10 [03/02-03/08]">W10 [03/02-03/08]</option><option value="W11 [03/09-03/15]">W11 [03/09-03/15]</option><option value="W12 [03/16-03/22]">W12 [03/16-03/22]</option><option value="W13 [03/23-03/29]">W13 [03/23-03/29]</option><option value="W14 [03/30-04/05]">W14 [03/30-04/05]</option><option value="W15 [04/06-04/12]">W15 [04/06-04/12]</option><option value="W16 [04/13-04/19]" selected>W16 [04/13-04/19]</option></select>
+        </div>
+        <div class="filter-group">
+            <label for="sc-trend-range">بازه ترند</label>
+            <select id="sc-trend-range">
+        <option value="4">۴ هفته اخیر</option>
+        <option value="8" selected>۸ هفته اخیر</option>
+        <option value="all">همه هفته‌ها</option>
+    </select>
+        </div>
+    </div>
+    <div class="compare-note" id="sc-compare-note"></div>
+    <div class="metric-grid" id="sc-cards"></div>
+
+    <div class="sc-trend-panel">
+        <div class="sc-trend-title">ترند هفتگی</div>
+        <div class="chart-canvas-wrap">
+            <canvas id="sc-trend-chart"></canvas>
+        </div>
+    </div>
+
+    <div class="section-label">تفکیک کلیدواژه‌ها بر اساس دسته (مطابق شیت)</div>
+    <div class="filters">
+        <div class="filter-group">
+            <label for="week-filter">هفته انتخابی</label>
+            <select id="week-filter"><option value="W02 [01/08-01/14]">W02 [01/08-01/14]</option><option value="W03 [01/15-01/21]">W03 [01/15-01/21]</option><option value="W04 [01/22-01/28]">W04 [01/22-01/28]</option><option value="W05 [01/29-01/04]">W05 [01/29-01/04]</option><option value="W06 [02/05-02/11]">W06 [02/05-02/11]</option><option value="W07 [02/12-02/18]">W07 [02/12-02/18]</option><option value="W08 [02/19-02/25]">W08 [02/19-02/25]</option><option value="W09 [02/26-02/01]">W09 [02/26-02/01]</option><option value="W10 [03/02-03/08]">W10 [03/02-03/08]</option><option value="W11 [03/09-03/15]">W11 [03/09-03/15]</option><option value="W12 [03/16-03/22]">W12 [03/16-03/22]</option><option value="W13 [03/23-03/29]">W13 [03/23-03/29]</option><option value="W14 [03/30-04/05]">W14 [03/30-04/05]</option><option value="W15 [04/06-04/12]">W15 [04/06-04/12]</option><option value="W16 [04/13-04/19]" selected>W16 [04/13-04/19]</option></select>
+        </div>
+        <div class="filter-group">
+            <label for="category-filter">Category</label>
+            <select id="category-filter">
+                <option value="all">همه</option>
+                <option value="تخمین قیمت">تخمین قیمت</option><option value="خرید">خرید</option><option value="شهر">شهر</option><option value="فروش">فروش</option><option value="قیمت">قیمت</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label for="keyword-search">جستجوی کلمه</label>
+            <input id="keyword-search" type="text" placeholder="مثلاً قیمت خودرو">
+        </div>
+    </div>
+    <div class="compare-note" id="compare-note"></div>
+
+    <div class="filters kw-trend-filters">
+        <div class="filter-group">
+            <label for="kw-from-week">ترند Po از هفته</label>
+            <select id="kw-from-week"></select>
+        </div>
+        <div class="filter-group">
+            <label for="kw-to-week">تا هفته</label>
+            <select id="kw-to-week"></select>
+        </div>
+        <div class="filter-group">
+            <label for="kw-trend-select">کلیدواژه</label>
+            <select id="kw-trend-select"></select>
+        </div>
+    </div>
+
+    <div class="category-groups keyword-tabs-shell">
+        <div class="keyword-tabs" id="keyword-tabs"></div>
+        <div class="keyword-panel" id="keyword-panel"></div>
+    </div>
+
+    <div class="tabs-shell">
+        <div class="tabs">
+            <button class="tab-button active" data-tab="business-tab">Business KPIs</button>
+            <button class="tab-button" data-tab="kpi-tab">KPI Full Trend</button>
+        </div>
+
+        <div id="business-tab" class="tab-content active">
+            <div class="tab-section-title">Business KPIs</div>
+            <div class="tab-section-subtitle">Q request، Buy، Sessions و سایر شاخص‌های بیزینسی به تفکیک هفته.</div>
+            <div class="panel">
+                <div class="table-wrapper">
+                    <table class="kpi-table" id="business-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="kpi-tab" class="tab-content">
+            <div class="tab-section-title">KPI Weekly Trend</div>
+            <div class="tab-section-subtitle">تمام شاخص‌های بلوک KPI شیت با رشد هفتگی.</div>
+            <div class="panel">
+                <div class="table-wrapper">
+                    <table class="kpi-table" id="kpi-table">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <span>گزارش از خروجی هفتگی شیت ساخته شده است.</span>
+        <span id="footer-week-note"></span>
+    </div>
+</div>
+
+<script>
+const reportData = {"weekLabels": ["W02 [01/08-01/14]", "W03 [01/15-01/21]", "W04 [01/22-01/28]", "W05 [01/29-01/04]", "W06 [02/05-02/11]", "W07 [02/12-02/18]", "W08 [02/19-02/25]", "W09 [02/26-02/01]", "W10 [03/02-03/08]", "W11 [03/09-03/15]", "W12 [03/16-03/22]", "W13 [03/23-03/29]", "W14 [03/30-04/05]", "W15 [04/06-04/12]", "W16 [04/13-04/19]"], "defaultWeek": "W16 [04/13-04/19]", "kpiMetrics": {"Organic users": {"W02 [01/08-01/14]": {"value": 1206.0, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 7168.0, "growth_pct": 494.36}, "W04 [01/22-01/28]": {"value": 8042.0, "growth_pct": 12.19}, "W05 [01/29-01/04]": {"value": 4882.0, "growth_pct": -39.29}, "W06 [02/05-02/11]": {"value": 10115.0, "growth_pct": 107.19}, "W07 [02/12-02/18]": {"value": 9434.0, "growth_pct": -6.73}, "W08 [02/19-02/25]": {"value": 8955.0, "growth_pct": -5.08}, "W09 [02/26-02/01]": {"value": 9642.0, "growth_pct": 7.67}, "W10 [03/02-03/08]": {"value": 89171.0, "growth_pct": 824.82}, "W11 [03/09-03/15]": {"value": 420226.0, "growth_pct": 371.26}, "W12 [03/16-03/22]": {"value": 704002.0, "growth_pct": 67.53}, "W13 [03/23-03/29]": {"value": 860784.0, "growth_pct": 22.27}, "W14 [03/30-04/05]": {"value": 681664.0, "growth_pct": -20.81}, "W15 [04/06-04/12]": {"value": 670471.0, "growth_pct": -1.64}, "W16 [04/13-04/19]": {"value": 520365.0, "growth_pct": -22.39}}, "Organic new users": {"W02 [01/08-01/14]": {"value": 1122.0, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 4620.0, "growth_pct": 311.76}, "W04 [01/22-01/28]": {"value": 5006.0, "growth_pct": 8.35}, "W05 [01/29-01/04]": {"value": 2480.0, "growth_pct": -50.46}, "W06 [02/05-02/11]": {"value": 5483.0, "growth_pct": 121.09}, "W07 [02/12-02/18]": {"value": 4040.0, "growth_pct": -26.32}, "W08 [02/19-02/25]": {"value": 3764.0, "growth_pct": -6.83}, "W09 [02/26-02/01]": {"value": 3974.0, "growth_pct": 5.58}, "W10 [03/02-03/08]": {"value": 33514.0, "growth_pct": 743.33}, "W11 [03/09-03/15]": {"value": 207040.0, "growth_pct": 517.77}, "W12 [03/16-03/22]": {"value": 322301.0, "growth_pct": 55.67}, "W13 [03/23-03/29]": {"value": 388128.0, "growth_pct": 20.42}, "W14 [03/30-04/05]": {"value": 283327.0, "growth_pct": -27.0}, "W15 [04/06-04/12]": {"value": 269423.0, "growth_pct": -4.91}, "W16 [04/13-04/19]": {"value": 211636.0, "growth_pct": -21.45}}, "Sessions": {"W02 [01/08-01/14]": {"value": 1408.0, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 8912.0, "growth_pct": 532.95}, "W04 [01/22-01/28]": {"value": 9770.0, "growth_pct": 9.63}, "W05 [01/29-01/04]": {"value": 6219.0, "growth_pct": -36.35}, "W06 [02/05-02/11]": {"value": 13224.0, "growth_pct": 112.64}, "W07 [02/12-02/18]": {"value": 13283.0, "growth_pct": 0.45}, "W08 [02/19-02/25]": {"value": 12629.0, "growth_pct": -4.92}, "W09 [02/26-02/01]": {"value": 13509.0, "growth_pct": 6.97}, "W10 [03/02-03/08]": {"value": 92797.0, "growth_pct": 586.93}, "W11 [03/09-03/15]": {"value": 570405.0, "growth_pct": 514.68}, "W12 [03/16-03/22]": {"value": 955459.0, "growth_pct": 67.51}, "W13 [03/23-03/29]": {"value": 1215417.0, "growth_pct": 27.21}, "W14 [03/30-04/05]": {"value": 929934.0, "growth_pct": -23.49}, "W15 [04/06-04/12]": {"value": 920760.0, "growth_pct": -0.99}, "W16 [04/13-04/19]": {"value": 713085.0, "growth_pct": -22.55}}, "Engaged Sessions": {"W02 [01/08-01/14]": {"value": 339.0, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 5349.0, "growth_pct": 1477.88}, "W04 [01/22-01/28]": {"value": 5642.0, "growth_pct": 5.48}, "W05 [01/29-01/04]": {"value": 3758.0, "growth_pct": -33.39}, "W06 [02/05-02/11]": {"value": 8315.0, "growth_pct": 121.26}, "W07 [02/12-02/18]": {"value": 8922.0, "growth_pct": 7.3}, "W08 [02/19-02/25]": {"value": 8843.0, "growth_pct": -0.89}, "W09 [02/26-02/01]": {"value": 9512.0, "growth_pct": 7.57}, "W10 [03/02-03/08]": {"value": 72993.0, "growth_pct": 667.38}, "W11 [03/09-03/15]": {"value": 436799.0, "growth_pct": 498.41}, "W12 [03/16-03/22]": {"value": 682960.0, "growth_pct": 56.36}, "W13 [03/23-03/29]": {"value": 904826.0, "growth_pct": 32.49}, "W14 [03/30-04/05]": {"value": 670881.0, "growth_pct": -25.86}, "W15 [04/06-04/12]": {"value": 684473.0, "growth_pct": 2.03}, "W16 [04/13-04/19]": {"value": 515178.0, "growth_pct": -24.73}}, "Referring Domain": {"W02 [01/08-01/14]": {"value": null, "growth_pct": null}, "W03 [01/15-01/21]": {"value": null, "growth_pct": null}, "W04 [01/22-01/28]": {"value": null, "growth_pct": null}, "W05 [01/29-01/04]": {"value": null, "growth_pct": null}, "W06 [02/05-02/11]": {"value": null, "growth_pct": null}, "W07 [02/12-02/18]": {"value": 1115.0, "growth_pct": null}, "W08 [02/19-02/25]": {"value": 1139.0, "growth_pct": null}, "W09 [02/26-02/01]": {"value": 1203.0, "growth_pct": null}, "W10 [03/02-03/08]": {"value": 1225.0, "growth_pct": null}, "W11 [03/09-03/15]": {"value": 1248.0, "growth_pct": null}, "W12 [03/16-03/22]": {"value": 1233.0, "growth_pct": null}, "W13 [03/23-03/29]": {"value": 1235.0, "growth_pct": null}, "W14 [03/30-04/05]": {"value": 1272.0, "growth_pct": null}, "W15 [04/06-04/12]": {"value": 1277.0, "growth_pct": null}, "W16 [04/13-04/19]": {"value": null, "growth_pct": null}}, "spam score": {"W02 [01/08-01/14]": {"value": null, "growth_pct": null}, "W03 [01/15-01/21]": {"value": null, "growth_pct": null}, "W04 [01/22-01/28]": {"value": 2.0, "growth_pct": null}, "W05 [01/29-01/04]": {"value": 2.0, "growth_pct": null}, "W06 [02/05-02/11]": {"value": 1.0, "growth_pct": null}, "W07 [02/12-02/18]": {"value": 2.0, "growth_pct": null}, "W08 [02/19-02/25]": {"value": 2.0, "growth_pct": null}, "W09 [02/26-02/01]": {"value": 2.0, "growth_pct": null}, "W10 [03/02-03/08]": {"value": 2.0, "growth_pct": null}, "W11 [03/09-03/15]": {"value": 1.0, "growth_pct": null}, "W12 [03/16-03/22]": {"value": 1.0, "growth_pct": null}, "W13 [03/23-03/29]": {"value": 1.0, "growth_pct": null}, "W14 [03/30-04/05]": {"value": 1.0, "growth_pct": null}, "W15 [04/06-04/12]": {"value": 1.0, "growth_pct": null}, "W16 [04/13-04/19]": {"value": 1.0, "growth_pct": null}}, "Q request": {"W02 [01/08-01/14]": {"value": 731.0, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 2426.0, "growth_pct": 231.87}, "W04 [01/22-01/28]": {"value": 4592.0, "growth_pct": 89.28}, "W05 [01/29-01/04]": {"value": 6821.0, "growth_pct": 48.54}, "W06 [02/05-02/11]": {"value": 8930.0, "growth_pct": 30.92}, "W07 [02/12-02/18]": {"value": 10323.0, "growth_pct": 15.6}, "W08 [02/19-02/25]": {"value": 9066.0, "growth_pct": -12.18}, "W09 [02/26-02/01]": {"value": 8778.0, "growth_pct": -3.18}, "W10 [03/02-03/08]": {"value": 9728.0, "growth_pct": 10.82}, "W11 [03/09-03/15]": {"value": 10482.0, "growth_pct": 7.75}, "W12 [03/16-03/22]": {"value": 9894.0, "growth_pct": -5.61}, "W13 [03/23-03/29]": {"value": 13175.0, "growth_pct": 33.16}, "W14 [03/30-04/05]": {"value": 8669.0, "growth_pct": -34.2}, "W15 [04/06-04/12]": {"value": 9948.0, "growth_pct": 14.75}, "W16 [04/13-04/19]": {"value": 7426.0, "growth_pct": -25.35}}, "Q request - non blog": {"W02 [01/08-01/14]": {"value": 521.0, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 2220.0, "growth_pct": null}, "W04 [01/22-01/28]": {"value": 4151.0, "growth_pct": null}, "W05 [01/29-01/04]": {"value": 5920.0, "growth_pct": null}, "W06 [02/05-02/11]": {"value": 7808.0, "growth_pct": null}, "W07 [02/12-02/18]": {"value": 9296.0, "growth_pct": null}, "W08 [02/19-02/25]": {"value": 8408.0, "growth_pct": null}, "W09 [02/26-02/01]": {"value": 8038.0, "growth_pct": null}, "W10 [03/02-03/08]": {"value": 8653.0, "growth_pct": null}, "W11 [03/09-03/15]": {"value": 9394.0, "growth_pct": null}, "W12 [03/16-03/22]": {"value": 8924.0, "growth_pct": null}, "W13 [03/23-03/29]": {"value": 11703.0, "growth_pct": null}, "W14 [03/30-04/05]": {"value": 7673.0, "growth_pct": null}, "W15 [04/06-04/12]": {"value": 9108.0, "growth_pct": null}, "W16 [04/13-04/19]": {"value": 6863.0, "growth_pct": null}}, "Buy": {"W02 [01/08-01/14]": {"value": 33.0, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 139.0, "growth_pct": null}, "W04 [01/22-01/28]": {"value": 278.0, "growth_pct": null}, "W05 [01/29-01/04]": {"value": 299.0, "growth_pct": null}, "W06 [02/05-02/11]": {"value": 468.0, "growth_pct": null}, "W07 [02/12-02/18]": {"value": 474.0, "growth_pct": null}, "W08 [02/19-02/25]": {"value": 447.0, "growth_pct": null}, "W09 [02/26-02/01]": {"value": 297.0, "growth_pct": null}, "W10 [03/02-03/08]": {"value": 237.0, "growth_pct": null}, "W11 [03/09-03/15]": {"value": 262.0, "growth_pct": null}, "W12 [03/16-03/22]": {"value": 296.0, "growth_pct": null}, "W13 [03/23-03/29]": {"value": 205.0, "growth_pct": null}, "W14 [03/30-04/05]": {"value": 95.0, "growth_pct": null}, "W15 [04/06-04/12]": {"value": 226.0, "growth_pct": null}, "W16 [04/13-04/19]": {"value": 218.0, "growth_pct": null}}, "Buy - non blog": {"W02 [01/08-01/14]": {"value": 26.0, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 132.0, "growth_pct": null}, "W04 [01/22-01/28]": {"value": 264.0, "growth_pct": null}, "W05 [01/29-01/04]": {"value": 289.0, "growth_pct": null}, "W06 [02/05-02/11]": {"value": 448.0, "growth_pct": null}, "W07 [02/12-02/18]": {"value": 455.0, "growth_pct": null}, "W08 [02/19-02/25]": {"value": 432.0, "growth_pct": null}, "W09 [02/26-02/01]": {"value": 287.0, "growth_pct": null}, "W10 [03/02-03/08]": {"value": 228.0, "growth_pct": null}, "W11 [03/09-03/15]": {"value": 251.0, "growth_pct": null}, "W12 [03/16-03/22]": {"value": 279.0, "growth_pct": null}, "W13 [03/23-03/29]": {"value": 196.0, "growth_pct": null}, "W14 [03/30-04/05]": {"value": 91.0, "growth_pct": null}, "W15 [04/06-04/12]": {"value": 215.0, "growth_pct": null}, "W16 [04/13-04/19]": {"value": 214.0, "growth_pct": null}}, "impression": {"W02 [01/08-01/14]": {"value": 19208.0, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 319816.0, "growth_pct": 1565.01}, "W04 [01/22-01/28]": {"value": 3800131.0, "growth_pct": 1088.22}, "W05 [01/29-01/04]": {"value": 12324886.0, "growth_pct": 224.33}, "W06 [02/05-02/11]": {"value": 16650409.0, "growth_pct": 35.1}, "W07 [02/12-02/18]": {"value": 16730183.0, "growth_pct": 0.48}, "W08 [02/19-02/25]": {"value": 11762069.0, "growth_pct": -29.7}, "W09 [02/26-02/01]": {"value": 16306973.0, "growth_pct": 38.64}, "W10 [03/02-03/08]": {"value": 14453289.0, "growth_pct": -11.37}, "W11 [03/09-03/15]": {"value": 12675847.0, "growth_pct": -12.3}, "W12 [03/16-03/22]": {"value": 11551178.0, "growth_pct": -8.87}, "W13 [03/23-03/29]": {"value": 13255525.0, "growth_pct": 14.75}, "W14 [03/30-04/05]": {"value": 10846522.0, "growth_pct": -18.17}, "W15 [04/06-04/12]": {"value": 10824753.0, "growth_pct": -0.2}, "W16 [04/13-04/19]": {"value": 9282546.0, "growth_pct": -14.25}}, "click": {"W02 [01/08-01/14]": {"value": 1473.0, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 13512.0, "growth_pct": 817.31}, "W04 [01/22-01/28]": {"value": 293822.0, "growth_pct": 2074.53}, "W05 [01/29-01/04]": {"value": 1132771.0, "growth_pct": 285.53}, "W06 [02/05-02/11]": {"value": 1473028.0, "growth_pct": 30.04}, "W07 [02/12-02/18]": {"value": 1511448.0, "growth_pct": 2.61}, "W08 [02/19-02/25]": {"value": 868805.0, "growth_pct": -42.52}, "W09 [02/26-02/01]": {"value": 1096559.0, "growth_pct": 26.21}, "W10 [03/02-03/08]": {"value": 1092071.0, "growth_pct": -0.41}, "W11 [03/09-03/15]": {"value": 952182.0, "growth_pct": -12.81}, "W12 [03/16-03/22]": {"value": 882189.0, "growth_pct": -7.35}, "W13 [03/23-03/29]": {"value": 1071159.0, "growth_pct": 21.42}, "W14 [03/30-04/05]": {"value": 827725.0, "growth_pct": -22.73}, "W15 [04/06-04/12]": {"value": 790821.0, "growth_pct": -4.46}, "W16 [04/13-04/19]": {"value": 654667.0, "growth_pct": -17.22}}, "Click-branded": {"W02 [01/08-01/14]": {"value": null, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 378.0, "growth_pct": null}, "W04 [01/22-01/28]": {"value": 15199.0, "growth_pct": null}, "W05 [01/29-01/04]": {"value": 69476.0, "growth_pct": null}, "W06 [02/05-02/11]": {"value": 115893.0, "growth_pct": null}, "W07 [02/12-02/18]": {"value": 86606.0, "growth_pct": null}, "W08 [02/19-02/25]": {"value": 80803.0, "growth_pct": null}, "W09 [02/26-02/01]": {"value": 74250.0, "growth_pct": null}, "W10 [03/02-03/08]": {"value": 91950.0, "growth_pct": null}, "W11 [03/09-03/15]": {"value": 98876.0, "growth_pct": null}, "W12 [03/16-03/22]": {"value": 89207.0, "growth_pct": null}, "W13 [03/23-03/29]": {"value": 99845.0, "growth_pct": null}, "W14 [03/30-04/05]": {"value": 68561.0, "growth_pct": null}, "W15 [04/06-04/12]": {"value": 89982.0, "growth_pct": null}, "W16 [04/13-04/19]": {"value": 78601.0, "growth_pct": null}}, "Click-non branded": {"W02 [01/08-01/14]": {"value": null, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 8231.0, "growth_pct": null}, "W04 [01/22-01/28]": {"value": 101540.0, "growth_pct": null}, "W05 [01/29-01/04]": {"value": 131448.0, "growth_pct": 29.45}, "W06 [02/05-02/11]": {"value": 222267.0, "growth_pct": 69.09}, "W07 [02/12-02/18]": {"value": 364391.0, "growth_pct": 63.94}, "W08 [02/19-02/25]": {"value": 196330.0, "growth_pct": -46.12}, "W09 [02/26-02/01]": {"value": 122280.0, "growth_pct": -37.72}, "W10 [03/02-03/08]": {"value": 111669.0, "growth_pct": -8.68}, "W11 [03/09-03/15]": {"value": 114799.0, "growth_pct": 2.8}, "W12 [03/16-03/22]": {"value": 104663.0, "growth_pct": -8.83}, "W13 [03/23-03/29]": {"value": 153287.0, "growth_pct": 46.46}, "W14 [03/30-04/05]": {"value": 94996.0, "growth_pct": -38.03}, "W15 [04/06-04/12]": {"value": 83778.0, "growth_pct": -11.81}, "W16 [04/13-04/19]": {"value": 71401.0, "growth_pct": null}}, "Brand Click Share": {"W02 [01/08-01/14]": {"value": null, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 4.39, "growth_pct": null}, "W04 [01/22-01/28]": {"value": 13.02, "growth_pct": null}, "W05 [01/29-01/04]": {"value": 34.58, "growth_pct": null}, "W06 [02/05-02/11]": {"value": 34.27, "growth_pct": null}, "W07 [02/12-02/18]": {"value": 19.2, "growth_pct": null}, "W08 [02/19-02/25]": {"value": 29.16, "growth_pct": null}, "W09 [02/26-02/01]": {"value": 37.78, "growth_pct": null}, "W10 [03/02-03/08]": {"value": 45.16, "growth_pct": null}, "W11 [03/09-03/15]": {"value": 46.27, "growth_pct": null}, "W12 [03/16-03/22]": {"value": 46.01, "growth_pct": null}, "W13 [03/23-03/29]": {"value": 39.44, "growth_pct": null}, "W14 [03/30-04/05]": {"value": 41.92, "growth_pct": null}, "W15 [04/06-04/12]": {"value": 51.79, "growth_pct": null}, "W16 [04/13-04/19]": {"value": 52.4, "growth_pct": null}}, "ctr": {"W02 [01/08-01/14]": {"value": null, "growth_pct": null}, "W03 [01/15-01/21]": {"value": 7.6, "growth_pct": null}, "W04 [01/22-01/28]": {"value": 7.7, "growth_pct": 1.32}, "W05 [01/29-01/04]": {"value": 9.2, "growth_pct": 19.48}, "W06 [02/05-02/11]": {"value": 8.8, "growth_pct": -4.35}, "W07 [02/12-02/18]": {"value": 9.0, "growth_pct": 2.27}, "W08 [02/19-02/25]": {"value": 7.4, "growth_pct": -17.78}, "W09 [02/26-02/01]": {"value": 6.7, "growth_pct": -9.46}, "W10 [03/02-03/08]": {"value": 7.6, "growth_pct": 13.43}, "W11 [03/09-03/15]": {"value": 7.5, "growth_pct": -1.32}, "W12 [03/16-03/22]": {"value": 7.6, "growth_pct": 1.33}, "W13 [03/23-03/29]": {"value": 8.1, "growth_pct": 6.58}, "W14 [03/30-04/05]": {"value": 7.6, "growth_pct": -6.17}, "W15 [04/06-04/12]": {"value": 7.3, "growth_pct": -3.95}, "W16 [04/13-04/19]": {"value": 7.1, "growth_pct": -2.74}}, "rank": {"W02 [01/08-01/14]": {"value": null, "growth_pct": null}, "W03 [01/15-01/21]": {"value": null, "growth_pct": null}, "W04 [01/22-01/28]": {"value": 5.2, "growth_pct": null}, "W05 [01/29-01/04]": {"value": 4.8, "growth_pct": null}, "W06 [02/05-02/11]": {"value": 4.7, "growth_pct": null}, "W07 [02/12-02/18]": {"value": 4.9, "growth_pct": null}, "W08 [02/19-02/25]": {"value": 5.2, "growth_pct": null}, "W09 [02/26-02/01]": {"value": 5.0, "growth_pct": null}, "W10 [03/02-03/08]": {"value": 4.8, "growth_pct": null}, "W11 [03/09-03/15]": {"value": 4.9, "growth_pct": null}, "W12 [03/16-03/22]": {"value": 4.8, "growth_pct": null}, "W13 [03/23-03/29]": {"value": 4.7, "growth_pct": null}, "W14 [03/30-04/05]": {"value": 4.8, "growth_pct": null}, "W15 [04/06-04/12]": {"value": 4.9, "growth_pct": null}, "W16 [04/13-04/19]": {"value": 4.9, "growth_pct": null}}}, "keywordSections": {"seed_keywords": [{"category": "فروش", "keyword": "فروش خودرو", "seed_keyword": "فروش خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 36.0, "position": 5.0}, "W03 [01/15-01/21]": {"impressions": 57.0, "position": 1.5}, "W04 [01/22-01/28]": {"impressions": 926.0, "position": 3.1}, "W05 [01/29-02/04]": {"impressions": 2431.0, "position": 3.1}, "W06 [02/05-02/11]": {"impressions": 3673.0, "position": 3.8}, "W07 [02/12-02/18]": {"impressions": 5222.0, "position": 4.6}, "W08 [02/19-02/25]": {"impressions": 3484.0, "position": 5.7}, "W09 [02/26-03/01]": {"impressions": 3696.0, "position": 5.4}, "W10 [03/02-03/08]": {"impressions": 3400.0, "position": 5.2}, "W11 [03/09-03/15]": {"impressions": 2623.0, "position": 5.6}, "W12 [03/16-03/22]": {"impressions": 2659.0, "position": 5.1}, "W13 [03/23-03/29]": {"impressions": 2319.0, "position": 5.5}, "W14 [03/30-04/05]": {"impressions": 2183.0, "position": 4.9}, "W15 [04/06-04/12]": {"impressions": 2598.0, "position": 5.3}, "W16 [04/13-04/19]": {"impressions": 2125.0, "position": 4.6}}}, {"category": "فروش", "keyword": "فروش ماشین", "seed_keyword": "فروش ماشین", "metrics": {"W02 [01/08-01/14]": {"impressions": 13.0, "position": 2.4}, "W03 [01/15-01/21]": {"impressions": 11.0, "position": 4.1}, "W04 [01/22-01/28]": {"impressions": 337.0, "position": 2.3}, "W05 [01/29-02/04]": {"impressions": 738.0, "position": 2.5}, "W06 [02/05-02/11]": {"impressions": 959.0, "position": 3.2}, "W07 [02/12-02/18]": {"impressions": 1157.0, "position": 3.7}, "W08 [02/19-02/25]": {"impressions": 886.0, "position": 4.5}, "W09 [02/26-03/01]": {"impressions": 1099.0, "position": 4.2}, "W10 [03/02-03/08]": {"impressions": 796.0, "position": 3.8}, "W11 [03/09-03/15]": {"impressions": 745.0, "position": 4.4}, "W12 [03/16-03/22]": {"impressions": 655.0, "position": 4.3}, "W13 [03/23-03/29]": {"impressions": 700.0, "position": 4.4}, "W14 [03/30-04/05]": {"impressions": 544.0, "position": 4.3}, "W15 [04/06-04/12]": {"impressions": 560.0, "position": 4.5}, "W16 [04/13-04/19]": {"impressions": 537.0, "position": 4.8}}}, {"category": "فروش", "keyword": "فروش خودرو کارکرده", "seed_keyword": "فروش خودرو کارکرده", "metrics": {"W02 [01/08-01/14]": {"impressions": 3.0, "position": 1.7}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 51.0, "position": 1.2}, "W05 [01/29-02/04]": {"impressions": 98.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 166.0, "position": 2.3}, "W07 [02/12-02/18]": {"impressions": 149.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 140.0, "position": 3.0}, "W09 [02/26-03/01]": {"impressions": 160.0, "position": 2.2}, "W10 [03/02-03/08]": {"impressions": 193.0, "position": 2.4}, "W11 [03/09-03/15]": {"impressions": 198.0, "position": 2.3}, "W12 [03/16-03/22]": {"impressions": 220.0, "position": 2.1}, "W13 [03/23-03/29]": {"impressions": 243.0, "position": 2.3}, "W14 [03/30-04/05]": {"impressions": 196.0, "position": 2.6}, "W15 [04/06-04/12]": {"impressions": 193.0, "position": 2.4}, "W16 [04/13-04/19]": {"impressions": 138.0, "position": 2.3}}}, {"category": "فروش", "keyword": "فروش فوری خودرو", "seed_keyword": "فروش فوری خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 5.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 5.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 122.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 228.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 339.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 555.0, "position": 2.0}, "W08 [02/19-02/25]": {"impressions": 423.0, "position": 1.0}, "W09 [02/26-03/01]": {"impressions": 330.0, "position": 1.0}, "W10 [03/02-03/08]": {"impressions": 399.0, "position": 1.0}, "W11 [03/09-03/15]": {"impressions": 345.0, "position": 1.4}, "W12 [03/16-03/22]": {"impressions": 310.0, "position": 1.5}, "W13 [03/23-03/29]": {"impressions": 287.0, "position": 1.6}, "W14 [03/30-04/05]": {"impressions": 221.0, "position": 1.5}, "W15 [04/06-04/12]": {"impressions": 229.0, "position": 1.4}, "W16 [04/13-04/19]": {"impressions": 151.0, "position": 1.2}}}, {"category": "فروش", "keyword": "فروش فوری خودرو کارکرده", "seed_keyword": "فروش فوری خودرو کارکرده", "metrics": {"W02 [01/08-01/14]": {"impressions": 2.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 43.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 96.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 136.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 175.0, "position": 1.1}, "W08 [02/19-02/25]": {"impressions": 155.0, "position": 1.1}, "W09 [02/26-03/01]": {"impressions": 132.0, "position": 1.1}, "W10 [03/02-03/08]": {"impressions": 160.0, "position": 1.1}, "W11 [03/09-03/15]": {"impressions": 176.0, "position": 1.2}, "W12 [03/16-03/22]": {"impressions": 158.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 243.0, "position": 1.4}, "W14 [03/30-04/05]": {"impressions": 172.0, "position": 1.3}, "W15 [04/06-04/12]": {"impressions": 261.0, "position": 1.3}, "W16 [04/13-04/19]": {"impressions": 153.0, "position": 1.3}}}, {"category": "فروش", "keyword": "فروش ماشین دست دوم", "seed_keyword": "فروش ماشین دست دوم", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 13.0, "position": 1.2}, "W05 [01/29-02/04]": {"impressions": 41.0, "position": 1.2}, "W06 [02/05-02/11]": {"impressions": 46.0, "position": 1.2}, "W07 [02/12-02/18]": {"impressions": 53.0, "position": 1.8}, "W08 [02/19-02/25]": {"impressions": 88.0, "position": 2.7}, "W09 [02/26-03/01]": {"impressions": 29.0, "position": 2.4}, "W10 [03/02-03/08]": {"impressions": 42.0, "position": 2.3}, "W11 [03/09-03/15]": {"impressions": 36.0, "position": 2.1}, "W12 [03/16-03/22]": {"impressions": 23.0, "position": 3.0}, "W13 [03/23-03/29]": {"impressions": 50.0, "position": 2.4}, "W14 [03/30-04/05]": {"impressions": 16.0, "position": 2.9}, "W15 [04/06-04/12]": {"impressions": 20.0, "position": 2.2}, "W16 [04/13-04/19]": {"impressions": 7.0, "position": 1.7}}}, {"category": "فروش", "keyword": "سایت فروش خودرو", "seed_keyword": "سایت فروش خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 4.0, "position": 1.3}, "W04 [01/22-01/28]": {"impressions": 76.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 304.0, "position": 1.4}, "W06 [02/05-02/11]": {"impressions": 487.0, "position": 2.0}, "W07 [02/12-02/18]": {"impressions": 760.0, "position": 2.7}, "W08 [02/19-02/25]": {"impressions": 471.0, "position": 2.7}, "W09 [02/26-03/01]": {"impressions": 533.0, "position": 2.5}, "W10 [03/02-03/08]": {"impressions": 417.0, "position": 1.9}, "W11 [03/09-03/15]": {"impressions": 365.0, "position": 2.6}, "W12 [03/16-03/22]": {"impressions": 291.0, "position": 2.2}, "W13 [03/23-03/29]": {"impressions": 441.0, "position": 2.3}, "W14 [03/30-04/05]": {"impressions": 306.0, "position": 2.2}, "W15 [04/06-04/12]": {"impressions": 328.0, "position": 2.5}, "W16 [04/13-04/19]": {"impressions": 258.0, "position": 2.7}}}, {"category": "فروش", "keyword": "سایت فروش ماشین", "seed_keyword": "سایت فروش ماشین", "metrics": {"W02 [01/08-01/14]": {"impressions": 1.0, "position": 2.0}, "W03 [01/15-01/21]": {"impressions": 1.0, "position": 2.0}, "W04 [01/22-01/28]": {"impressions": 54.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 205.0, "position": 1.3}, "W06 [02/05-02/11]": {"impressions": 229.0, "position": 2.2}, "W07 [02/12-02/18]": {"impressions": 262.0, "position": 2.4}, "W08 [02/19-02/25]": {"impressions": 238.0, "position": 2.8}, "W09 [02/26-03/01]": {"impressions": 277.0, "position": 2.3}, "W10 [03/02-03/08]": {"impressions": 195.0, "position": 2.2}, "W11 [03/09-03/15]": {"impressions": 252.0, "position": 2.5}, "W12 [03/16-03/22]": {"impressions": 177.0, "position": 2.1}, "W13 [03/23-03/29]": {"impressions": 204.0, "position": 2.3}, "W14 [03/30-04/05]": {"impressions": 154.0, "position": 2.0}, "W15 [04/06-04/12]": {"impressions": 193.0, "position": 2.0}, "W16 [04/13-04/19]": {"impressions": 153.0, "position": 2.2}}}, {"category": "فروش", "keyword": "خریدار خودرو", "seed_keyword": "خریدار خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 1.0, "position": 18.0}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 7.3}, "W04 [01/22-01/28]": {"impressions": 7.0, "position": 8.0}, "W05 [01/29-02/04]": {"impressions": 9.0, "position": 4.6}, "W06 [02/05-02/11]": {"impressions": 5.0, "position": 6.4}, "W07 [02/12-02/18]": {"impressions": 38.0, "position": 7.4}, "W08 [02/19-02/25]": {"impressions": 65.0, "position": 8.7}, "W09 [02/26-03/01]": {"impressions": 14.0, "position": 6.6}, "W10 [03/02-03/08]": {"impressions": 34.0, "position": 6.5}, "W11 [03/09-03/15]": {"impressions": 13.0, "position": 3.8}, "W12 [03/16-03/22]": {"impressions": 11.0, "position": 4.1}, "W13 [03/23-03/29]": {"impressions": 38.0, "position": 7.2}, "W14 [03/30-04/05]": {"impressions": 9.0, "position": 7.3}, "W15 [04/06-04/12]": {"impressions": 22.0, "position": 5.2}, "W16 [04/13-04/19]": {"impressions": 32.0, "position": 5.3}}}, {"category": "فروش", "keyword": "فروش ماشین پول لازم", "seed_keyword": "فروش ماشین پول لازم", "metrics": {"W02 [01/08-01/14]": {"impressions": 1.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 4.0, "position": 1.3}, "W05 [01/29-02/04]": {"impressions": 4.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 15.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 9.0, "position": 1.0}, "W08 [02/19-02/25]": {"impressions": 18.0, "position": 1.0}, "W09 [02/26-03/01]": {"impressions": 10.0, "position": 1.1}, "W10 [03/02-03/08]": {"impressions": 16.0, "position": 1.2}, "W11 [03/09-03/15]": {"impressions": 24.0, "position": 1.5}, "W12 [03/16-03/22]": {"impressions": 5.0, "position": 1.2}, "W13 [03/23-03/29]": {"impressions": 1.0, "position": 1.0}, "W14 [03/30-04/05]": {"impressions": 11.0, "position": 1.0}, "W15 [04/06-04/12]": {"impressions": 7.0, "position": 1.3}, "W16 [04/13-04/19]": {"impressions": 11.0, "position": 1.3}}}, {"category": "قیمت", "keyword": "قیمت خودرو", "seed_keyword": "قیمت خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 408.0, "position": 3.7}, "W03 [01/15-01/21]": {"impressions": 465.0, "position": 3.7}, "W04 [01/22-01/28]": {"impressions": 31751.0, "position": 3.9}, "W05 [01/29-02/04]": {"impressions": 76199.0, "position": 5.6}, "W06 [02/05-02/11]": {"impressions": 221148.0, "position": 6.7}, "W07 [02/12-02/18]": {"impressions": 233041.0, "position": 5.0}, "W08 [02/19-02/25]": {"impressions": 136301.0, "position": 5.0}, "W09 [02/26-03/01]": {"impressions": 130499.0, "position": 5.0}, "W10 [03/02-03/08]": {"impressions": 127031.0, "position": 5.9}, "W11 [03/09-03/15]": {"impressions": 111402.0, "position": 6.7}, "W12 [03/16-03/22]": {"impressions": 92275.0, "position": 7.1}, "W13 [03/23-03/29]": {"impressions": 197778.0, "position": 7.4}, "W14 [03/30-04/05]": {"impressions": 107497.0, "position": 7.3}, "W15 [04/06-04/12]": {"impressions": 117973.0, "position": 7.3}, "W16 [04/13-04/19]": {"impressions": 81489.0, "position": 7.2}}}, {"category": "قیمت", "keyword": "قیمت روز خودرو", "seed_keyword": "قیمت روز خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 383.0, "position": 3.3}, "W03 [01/15-01/21]": {"impressions": 716.0, "position": 3.0}, "W04 [01/22-01/28]": {"impressions": 32077.0, "position": 3.2}, "W05 [01/29-02/04]": {"impressions": 132070.0, "position": 4.1}, "W06 [02/05-02/11]": {"impressions": 371396.0, "position": 4.6}, "W07 [02/12-02/18]": {"impressions": 250796.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 122406.0, "position": 3.4}, "W09 [02/26-03/01]": {"impressions": 128091.0, "position": 4.3}, "W10 [03/02-03/08]": {"impressions": 145335.0, "position": 4.7}, "W11 [03/09-03/15]": {"impressions": 161271.0, "position": 5.3}, "W12 [03/16-03/22]": {"impressions": 147642.0, "position": 5.8}, "W13 [03/23-03/29]": {"impressions": 280681.0, "position": 6.4}, "W14 [03/30-04/05]": {"impressions": 155614.0, "position": 6.2}, "W15 [04/06-04/12]": {"impressions": 171320.0, "position": 6.5}, "W16 [04/13-04/19]": {"impressions": 126357.0, "position": 6.2}}}, {"category": "قیمت", "keyword": "قیمت خودرو امروز", "seed_keyword": "قیمت خودرو امروز", "metrics": {"W02 [01/08-01/14]": {"impressions": 112.0, "position": 2.4}, "W03 [01/15-01/21]": {"impressions": 149.0, "position": 2.6}, "W04 [01/22-01/28]": {"impressions": 5390.0, "position": 3.5}, "W05 [01/29-02/04]": {"impressions": 16459.0, "position": 3.6}, "W06 [02/05-02/11]": {"impressions": 56564.0, "position": 4.9}, "W07 [02/12-02/18]": {"impressions": 51183.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 26063.0, "position": 3.98}, "W09 [02/26-03/01]": {"impressions": 20055.0, "position": 3.91}, "W10 [03/02-03/08]": {"impressions": 25722.0, "position": 3.8}, "W11 [03/09-03/15]": {"impressions": 26439.0, "position": 4.0}, "W12 [03/16-03/22]": {"impressions": 22853.0, "position": 5.0}, "W13 [03/23-03/29]": {"impressions": 71433.0, "position": 5.7}, "W14 [03/30-04/05]": {"impressions": 30924.0, "position": 5.0}, "W15 [04/06-04/12]": {"impressions": 32102.0, "position": 5.4}, "W16 [04/13-04/19]": {"impressions": 23079.0, "position": 5.5}}}, {"category": "قیمت", "keyword": "قیمت روز خودرو کارخانه و بازار", "seed_keyword": "قیمت روز خودرو کارخانه و بازار", "metrics": {"W02 [01/08-01/14]": {"impressions": 153.0, "position": 2.4}, "W03 [01/15-01/21]": {"impressions": 210.0, "position": 2.6}, "W04 [01/22-01/28]": {"impressions": 19011.0, "position": 2.0}, "W05 [01/29-02/04]": {"impressions": 19975.0, "position": 2.3}, "W06 [02/05-02/11]": {"impressions": 31730.0, "position": 3.0}, "W07 [02/12-02/18]": {"impressions": 52870.0, "position": 2.2}, "W08 [02/19-02/25]": {"impressions": 20436.0, "position": 1.96}, "W09 [02/26-03/01]": {"impressions": 10231.0, "position": 1.54}, "W10 [03/02-03/08]": {"impressions": 12197.0, "position": 2.23}, "W11 [03/09-03/15]": {"impressions": 11618.0, "position": 1.92}, "W12 [03/16-03/22]": {"impressions": 9174.0, "position": 2.2}, "W13 [03/23-03/29]": {"impressions": 23630.0, "position": 2.2}, "W14 [03/30-04/05]": {"impressions": 12941.0, "position": 2.2}, "W15 [04/06-04/12]": {"impressions": 11861.0, "position": 2.1}, "W16 [04/13-04/19]": {"impressions": 9271.0, "position": 1.9}}}, {"category": "تخمین قیمت", "keyword": "تخمین قیمت خودرو", "seed_keyword": "تخمین قیمت خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 41.0, "position": 2.4}, "W03 [01/15-01/21]": {"impressions": 136.0, "position": 1.4}, "W04 [01/22-01/28]": {"impressions": 4680.0, "position": 1.3}, "W05 [01/29-02/04]": {"impressions": 16916.0, "position": 1.2}, "W06 [02/05-02/11]": {"impressions": 35354.0, "position": 1.3}, "W07 [02/12-02/18]": {"impressions": 27118.0, "position": 2.1}, "W08 [02/19-02/25]": {"impressions": 22440.0, "position": 2.5}, "W09 [02/26-03/01]": {"impressions": 20892.0, "position": 2.6}, "W10 [03/02-03/08]": {"impressions": 16974.0, "position": 2.6}, "W11 [03/09-03/15]": {"impressions": 15722.0, "position": 2.6}, "W12 [03/16-03/22]": {"impressions": 14879.0, "position": 2.5}, "W13 [03/23-03/29]": {"impressions": 15098.0, "position": 2.6}, "W14 [03/30-04/05]": {"impressions": 12091.0, "position": 2.7}, "W15 [04/06-04/12]": {"impressions": 13849.0, "position": 2.7}, "W16 [04/13-04/19]": {"impressions": 13262.0, "position": 2.7}}}, {"category": "تخمین قیمت", "keyword": "قیمت خودرو کارکرده", "seed_keyword": "قیمت خودرو کارکرده", "metrics": {"W02 [01/08-01/14]": {"impressions": 54.0, "position": 2.4}, "W03 [01/15-01/21]": {"impressions": 89.0, "position": 2.5}, "W04 [01/22-01/28]": {"impressions": 4707.0, "position": 2.3}, "W05 [01/29-02/04]": {"impressions": 11003.0, "position": 1.9}, "W06 [02/05-02/11]": {"impressions": 22811.0, "position": 2.0}, "W07 [02/12-02/18]": {"impressions": 16086.0, "position": 2.1}, "W08 [02/19-02/25]": {"impressions": 11908.0, "position": 2.4}, "W09 [02/26-03/01]": {"impressions": 10542.0, "position": 3.2}, "W10 [03/02-03/08]": {"impressions": 9058.0, "position": 3.5}, "W11 [03/09-03/15]": {"impressions": 8271.0, "position": 4.1}, "W12 [03/16-03/22]": {"impressions": 7503.0, "position": 4.5}, "W13 [03/23-03/29]": {"impressions": 9819.0, "position": 4.6}, "W14 [03/30-04/05]": {"impressions": 6934.0, "position": 3.6}, "W15 [04/06-04/12]": {"impressions": 7415.0, "position": 3.3}, "W16 [04/13-04/19]": {"impressions": 6558.0, "position": 3.0}}}, {"category": "تخمین قیمت", "keyword": "قیمت روز خودرو کارکرده", "seed_keyword": "قیمت روز خودرو کارکرده", "metrics": {"W02 [01/08-01/14]": {"impressions": 3.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 88.0, "position": 1.9}, "W05 [01/29-02/04]": {"impressions": 291.0, "position": 1.9}, "W06 [02/05-02/11]": {"impressions": 635.0, "position": 2.0}, "W07 [02/12-02/18]": {"impressions": 450.0, "position": 2.0}, "W08 [02/19-02/25]": {"impressions": 335.0, "position": 2.1}, "W09 [02/26-03/01]": {"impressions": 333.0, "position": 2.6}, "W10 [03/02-03/08]": {"impressions": 283.0, "position": 3.1}, "W11 [03/09-03/15]": {"impressions": 309.0, "position": 3.2}, "W12 [03/16-03/22]": {"impressions": 288.0, "position": 3.0}, "W13 [03/23-03/29]": {"impressions": 354.0, "position": 3.1}, "W14 [03/30-04/05]": {"impressions": 226.0, "position": 3.1}, "W15 [04/06-04/12]": {"impressions": 255.0, "position": 3.3}, "W16 [04/13-04/19]": {"impressions": 236.0, "position": 3.2}}}, {"category": "تخمین قیمت", "keyword": "تخمین قیمت خودرو کارکرده", "seed_keyword": "تخمین قیمت خودرو کارکرده", "metrics": {"W02 [01/08-01/14]": {"impressions": 20.0, "position": 1.1}, "W03 [01/15-01/21]": {"impressions": 23.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 914.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 3002.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 5592.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 3812.0, "position": 1.5}, "W08 [02/19-02/25]": {"impressions": 3012.0, "position": 2.4}, "W09 [02/26-03/01]": {"impressions": 2781.0, "position": 2.5}, "W10 [03/02-03/08]": {"impressions": 2378.0, "position": 2.6}, "W11 [03/09-03/15]": {"impressions": 2857.0, "position": 2.6}, "W12 [03/16-03/22]": {"impressions": 3244.0, "position": 2.4}, "W13 [03/23-03/29]": {"impressions": 2738.0, "position": 2.6}, "W14 [03/30-04/05]": {"impressions": 2222.0, "position": 2.7}, "W15 [04/06-04/12]": {"impressions": 2863.0, "position": 2.7}, "W16 [04/13-04/19]": {"impressions": 2490.0, "position": 2.7}}}, {"category": "خرید", "keyword": "خرید خودرو", "seed_keyword": "خرید خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 17.0, "position": 16.3}, "W04 [01/22-01/28]": {"impressions": 511.0, "position": 11.6}, "W05 [01/29-02/04]": {"impressions": 1044.0, "position": 10.5}, "W06 [02/05-02/11]": {"impressions": 365.0, "position": 12.0}, "W07 [02/06-02/12]": {"impressions": 782.0, "position": 11.4}, "W08 [02/19-02/25]": {"impressions": 84.0, "position": 11.1}, "W09 [02/26-03/01]": {"impressions": 119.0, "position": 12.2}, "W10 [03/02-03/08]": {"impressions": 255.0, "position": 11.5}, "W11 [03/09-03/15]": {"impressions": 120.0, "position": 11.7}, "W12 [03/16-03/22]": {"impressions": 269.0, "position": 12.1}, "W13 [03/23-03/29]": {"impressions": 87.0, "position": 11.4}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 1.0, "position": 6.0}, "W16 [04/13-04/19]": {"impressions": 10.0, "position": 12.0}}}, {"category": "خرید", "keyword": "خرید ماشین دست دوم", "seed_keyword": "خرید ماشین دست دوم", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 1.3}, "W04 [01/22-01/28]": {"impressions": 19.0, "position": 6.8}, "W05 [01/29-02/04]": {"impressions": 103.0, "position": 5.7}, "W06 [02/05-02/11]": {"impressions": 93.0, "position": 5.2}, "W07 [02/06-02/12]": {"impressions": 71.0, "position": 5.5}, "W08 [02/19-02/25]": {"impressions": 47.0, "position": 6.4}, "W09 [02/26-03/01]": {"impressions": 11.0, "position": 6.4}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 0.0, "position": 0.0}, "W12 [03/16-03/22]": {"impressions": 20.0, "position": 9.9}, "W13 [03/23-03/29]": {"impressions": 0.0, "position": 0.0}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 0.0, "position": 0.0}, "W16 [04/13-04/19]": {"impressions": 0.0, "position": 0.0}}}, {"category": "خرید", "keyword": "خرید و فروش خودرو", "seed_keyword": "خرید و فروش خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 14.0, "position": 5.9}, "W04 [01/22-01/28]": {"impressions": 313.0, "position": 2.9}, "W05 [01/29-02/04]": {"impressions": 747.0, "position": 3.4}, "W06 [02/05-02/11]": {"impressions": 1038.0, "position": 4.8}, "W07 [02/06-02/12]": {"impressions": 994.0, "position": 4.9}, "W08 [02/19-02/25]": {"impressions": 1020.0, "position": 5.5}, "W09 [02/26-03/01]": {"impressions": 942.0, "position": 5.4}, "W10 [03/02-03/08]": {"impressions": 862.0, "position": 5.1}, "W11 [03/09-03/15]": {"impressions": 759.0, "position": 6.0}, "W12 [03/16-03/22]": {"impressions": 707.0, "position": 5.6}, "W13 [03/23-03/29]": {"impressions": 714.0, "position": 5.7}, "W14 [03/30-04/05]": {"impressions": 502.0, "position": 6.6}, "W15 [04/06-04/12]": {"impressions": 665.0, "position": 5.5}, "W16 [04/13-04/19]": {"impressions": 612.0, "position": 5.8}}}], "category_keywords": [{"category": "قیمت", "keyword": "قیمت محصولات ایران خودرو", "category_keyword": "قیمت محصولات ایران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 27.0, "position": 3.5}, "W03 [01/15-01/21]": {"impressions": 34.0, "position": 2.8}, "W04 [01/22-01/28]": {"impressions": 4427.0, "position": 3.5}, "W05 [01/29-02/04]": {"impressions": 2192.0, "position": 7.4}, "W06 [02/05-02/11]": {"impressions": 21975.0, "position": 4.8}, "W07 [02/12-02/18]": {"impressions": 25741.0, "position": 4.0}, "W08 [02/19-02/25]": {"impressions": 13290.0, "position": 3.0}, "W09 [02/26-03/01]": {"impressions": 14188.0, "position": 4.3}, "W10 [03/02-03/08]": {"impressions": 10053.0, "position": 7.2}, "W11 [03/09-03/15]": {"impressions": 5791.0, "position": 6.8}, "W12 [03/16-03/22]": {"impressions": 5039.0, "position": 6.9}, "W13 [03/23-03/29]": {"impressions": 2839.0, "position": 6.2}, "W14 [03/30-04/05]": {"impressions": 462.0, "position": 6.3}, "W15 [04/06-04/12]": {"impressions": 167.0, "position": 6.4}, "W16 [04/13-04/19]": {"impressions": 266.0, "position": 6.6}}}, {"category": "قیمت", "keyword": "قیمت محصولات ایران خودرو کارخانه و بازار", "category_keyword": "قیمت محصولات ایران خودرو کارخانه و بازار", "metrics": {"W02 [01/08-01/14]": {"impressions": 19.0, "position": 1.8}, "W03 [01/15-01/21]": {"impressions": 34.0, "position": 1.5}, "W04 [01/22-01/28]": {"impressions": 9472.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 9970.0, "position": 2.1}, "W06 [02/05-02/11]": {"impressions": 13851.0, "position": 3.4}, "W07 [02/12-02/18]": {"impressions": 20662.0, "position": 2.2}, "W08 [02/19-02/25]": {"impressions": 10827.0, "position": 1.0}, "W09 [02/26-03/01]": {"impressions": 7297.0, "position": 1.0}, "W10 [03/02-03/08]": {"impressions": 6968.0, "position": 1.0}, "W11 [03/09-03/15]": {"impressions": 6744.0, "position": 3.0}, "W12 [03/16-03/22]": {"impressions": 5323.0, "position": 4.3}, "W13 [03/23-03/29]": {"impressions": 1644.0, "position": 6.1}, "W14 [03/30-04/05]": {"impressions": 1033.0, "position": 7.4}, "W15 [04/06-04/12]": {"impressions": 171.0, "position": 7.1}, "W16 [04/13-04/19]": {"impressions": 242.0, "position": 6.1}}}, {"category": "قیمت", "keyword": "قیمت بازار محصولات ایران خودرو", "category_keyword": "قیمت بازار محصولات ایران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 8.0, "position": 3.1}, "W04 [01/22-01/28]": {"impressions": 246.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 736.0, "position": 2.3}, "W06 [02/05-02/11]": {"impressions": 1425.0, "position": 3.2}, "W07 [02/12-02/18]": {"impressions": 2434.0, "position": 1.6}, "W08 [02/19-02/25]": {"impressions": 1653.0, "position": 2.8}, "W09 [02/26-03/01]": {"impressions": 1388.0, "position": 2.2}, "W10 [03/02-03/08]": {"impressions": 1266.0, "position": 2.4}, "W11 [03/09-03/15]": {"impressions": 1349.0, "position": 2.9}, "W12 [03/16-03/22]": {"impressions": 927.0, "position": 2.5}, "W13 [03/23-03/29]": {"impressions": 3329.0, "position": 3.2}, "W14 [03/30-04/05]": {"impressions": 4249.0, "position": 4.5}, "W15 [04/06-04/12]": {"impressions": 1289.0, "position": 3.4}, "W16 [04/13-04/19]": {"impressions": 947.0, "position": 2.8}}}, {"category": "قیمت", "keyword": "قیمت روز محصولات ایران خودرو", "category_keyword": "قیمت روز محصولات ایران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 2.0, "position": 3.0}, "W03 [01/15-01/21]": {"impressions": 5.0, "position": 2.2}, "W04 [01/22-01/28]": {"impressions": 418.0, "position": 2.5}, "W05 [01/29-02/04]": {"impressions": 1485.0, "position": 3.5}, "W06 [02/05-02/11]": {"impressions": 3827.0, "position": 3.6}, "W07 [02/12-02/18]": {"impressions": 3088.0, "position": 2.4}, "W08 [02/19-02/25]": {"impressions": 1565.0, "position": 2.4}, "W09 [02/26-03/01]": {"impressions": 1641.0, "position": 3.0}, "W10 [03/02-03/08]": {"impressions": 1648.0, "position": 3.0}, "W11 [03/09-03/15]": {"impressions": 1969.0, "position": 3.0}, "W12 [03/16-03/22]": {"impressions": 1679.0, "position": 3.0}, "W13 [03/23-03/29]": {"impressions": 4071.0, "position": 3.2}, "W14 [03/30-04/05]": {"impressions": 2609.0, "position": 3.4}, "W15 [04/06-04/12]": {"impressions": 2195.0, "position": 3.8}, "W16 [04/13-04/19]": {"impressions": 1488.0, "position": 3.2}}}, {"category": "قیمت", "keyword": "قیمت جدید محصولات ایران خودرو", "category_keyword": "قیمت جدید محصولات ایران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 2.0, "position": 3.5}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 112.0, "position": 5.2}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 528.0, "position": 5.3}, "W07 [02/12-02/18]": {"impressions": 980.0, "position": 5.0}, "W08 [02/19-02/25]": {"impressions": 129.0, "position": 6.0}, "W09 [02/26-03/01]": {"impressions": 543.0, "position": 3.8}, "W10 [03/02-03/08]": {"impressions": 10.0, "position": 8.3}, "W11 [03/09-03/15]": {"impressions": 32.0, "position": 7.3}, "W12 [03/16-03/22]": {"impressions": 34.0, "position": 9.0}, "W13 [03/23-03/29]": {"impressions": 51.0, "position": 7.8}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 0.0, "position": 0.0}, "W16 [04/13-04/19]": {"impressions": 3.0, "position": 5.0}}}, {"category": "قیمت", "keyword": "قیمت محصولات سایپا", "category_keyword": "قیمت محصولات سایپا", "metrics": {"W02 [01/08-01/14]": {"impressions": 4.0, "position": 3.8}, "W03 [01/15-01/21]": {"impressions": 16.0, "position": 3.0}, "W04 [01/22-01/28]": {"impressions": 3657.0, "position": 1.9}, "W05 [01/29-02/04]": {"impressions": 8240.0, "position": 4.7}, "W06 [02/05-02/11]": {"impressions": 15212.0, "position": 5.4}, "W07 [02/12-02/18]": {"impressions": 22305.0, "position": 3.1}, "W08 [02/19-02/25]": {"impressions": 11695.0, "position": 3.0}, "W09 [02/26-03/01]": {"impressions": 9692.0, "position": 3.0}, "W10 [03/02-03/08]": {"impressions": 8031.0, "position": 3.0}, "W11 [03/09-03/15]": {"impressions": 6550.0, "position": 2.0}, "W12 [03/16-03/22]": {"impressions": 5059.0, "position": 2.0}, "W13 [03/23-03/29]": {"impressions": 9703.0, "position": 2.3}, "W14 [03/30-04/05]": {"impressions": 7455.0, "position": 2.4}, "W15 [04/06-04/12]": {"impressions": 6247.0, "position": 2.8}, "W16 [04/13-04/19]": {"impressions": 5806.0, "position": 2.4}}}, {"category": "قیمت", "keyword": "قیمت محصولات سایپا کارخانه و بازار", "category_keyword": "قیمت محصولات سایپا کارخانه و بازار", "metrics": {"W02 [01/08-01/14]": {"impressions": 2.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 13.0, "position": 3.1}, "W04 [01/22-01/28]": {"impressions": 3592.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 6458.0, "position": 1.3}, "W06 [02/05-02/11]": {"impressions": 6087.0, "position": 2.0}, "W07 [02/12-02/18]": {"impressions": 6557.0, "position": 2.0}, "W08 [02/19-02/25]": {"impressions": 5111.0, "position": 2.0}, "W09 [02/26-03/01]": {"impressions": 3117.0, "position": 1.7}, "W10 [03/02-03/08]": {"impressions": 3253.0, "position": 1.4}, "W11 [03/09-03/15]": {"impressions": 2768.0, "position": 1.2}, "W12 [03/16-03/22]": {"impressions": 2493.0, "position": 1.2}, "W13 [03/23-03/29]": {"impressions": 5095.0, "position": 1.2}, "W14 [03/30-04/05]": {"impressions": 3215.0, "position": 1.2}, "W15 [04/06-04/12]": {"impressions": 3322.0, "position": 1.2}, "W16 [04/13-04/19]": {"impressions": 2756.0, "position": 1.2}}}, {"category": "قیمت", "keyword": "قیمت روز محصولات سایپا", "category_keyword": "قیمت روز محصولات سایپا", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 210.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 749.0, "position": 1.4}, "W06 [02/05-02/11]": {"impressions": 1954.0, "position": 3.6}, "W07 [02/12-02/18]": {"impressions": 1589.0, "position": 1.8}, "W08 [02/19-02/25]": {"impressions": 1015.0, "position": 1.8}, "W09 [02/26-03/01]": {"impressions": 863.0, "position": 2.0}, "W10 [03/02-03/08]": {"impressions": 830.0, "position": 1.0}, "W11 [03/09-03/15]": {"impressions": 739.0, "position": 1.0}, "W12 [03/16-03/22]": {"impressions": 637.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 1159.0, "position": 1.3}, "W14 [03/30-04/05]": {"impressions": 724.0, "position": 1.3}, "W15 [04/06-04/12]": {"impressions": 787.0, "position": 1.5}, "W16 [04/13-04/19]": {"impressions": 613.0, "position": 1.5}}}, {"category": "قیمت", "keyword": "قیمت بازار محصولات سایپا", "category_keyword": "قیمت بازار محصولات سایپا", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 3.7}, "W04 [01/22-01/28]": {"impressions": 263.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 643.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 1259.0, "position": 1.5}, "W07 [02/12-02/18]": {"impressions": 1038.0, "position": 1.6}, "W08 [02/19-02/25]": {"impressions": 799.0, "position": 1.9}, "W09 [02/26-03/01]": {"impressions": 481.0, "position": 1.9}, "W10 [03/02-03/08]": {"impressions": 578.0, "position": 1.3}, "W11 [03/09-03/15]": {"impressions": 461.0, "position": 1.1}, "W12 [03/16-03/22]": {"impressions": 348.0, "position": 1.1}, "W13 [03/23-03/29]": {"impressions": 577.0, "position": 1.1}, "W14 [03/30-04/05]": {"impressions": 464.0, "position": 1.2}, "W15 [04/06-04/12]": {"impressions": 519.0, "position": 1.4}, "W16 [04/13-04/19]": {"impressions": 347.0, "position": 1.4}}}, {"category": "قیمت", "keyword": "قیمت جدید محصولات سایپا", "category_keyword": "قیمت جدید محصولات سایپا", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 2.0, "position": 18.0}, "W04 [01/22-01/28]": {"impressions": 187.0, "position": 2.1}, "W05 [01/29-02/04]": {"impressions": 324.0, "position": 7.1}, "W06 [02/05-02/11]": {"impressions": 264.0, "position": 8.4}, "W07 [02/12-02/18]": {"impressions": 466.0, "position": 7.1}, "W08 [02/19-02/25]": {"impressions": 409.0, "position": 4.9}, "W09 [02/26-03/01]": {"impressions": 252.0, "position": 7.3}, "W10 [03/02-03/08]": {"impressions": 265.0, "position": 6.4}, "W11 [03/09-03/15]": {"impressions": 301.0, "position": 5.6}, "W12 [03/16-03/22]": {"impressions": 268.0, "position": 5.3}, "W13 [03/23-03/29]": {"impressions": 1013.0, "position": 6.7}, "W14 [03/30-04/05]": {"impressions": 1047.0, "position": 6.8}, "W15 [04/06-04/12]": {"impressions": 550.0, "position": 6.6}, "W16 [04/13-04/19]": {"impressions": 877.0, "position": 6.5}}}, {"category": "قیمت", "keyword": "قیمت محصولات مدیران خودرو", "category_keyword": "قیمت محصولات مدیران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 6.0, "position": 1.5}, "W04 [01/22-01/28]": {"impressions": 527.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 1420.0, "position": 1.8}, "W06 [02/05-02/11]": {"impressions": 2004.0, "position": 2.2}, "W07 [02/12-02/18]": {"impressions": 1946.0, "position": 3.5}, "W08 [02/19-02/25]": {"impressions": 2019.0, "position": 2.1}, "W09 [02/26-03/01]": {"impressions": 1550.0, "position": 1.9}, "W10 [03/02-03/08]": {"impressions": 1276.0, "position": 1.7}, "W11 [03/09-03/15]": {"impressions": 2802.0, "position": 3.3}, "W12 [03/16-03/22]": {"impressions": 1256.0, "position": 1.6}, "W13 [03/23-03/29]": {"impressions": 1135.0, "position": 1.6}, "W14 [03/30-04/05]": {"impressions": 824.0, "position": 1.6}, "W15 [04/06-04/12]": {"impressions": 843.0, "position": 1.7}, "W16 [04/13-04/19]": {"impressions": 703.0, "position": 1.7}}}, {"category": "قیمت", "keyword": "قیمت روز محصولات مدیران خودرو", "category_keyword": "قیمت روز محصولات مدیران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 1.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 82.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 201.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 358.0, "position": 1.3}, "W07 [02/12-02/18]": {"impressions": 353.0, "position": 2.0}, "W08 [02/19-02/25]": {"impressions": 291.0, "position": 1.9}, "W09 [02/26-03/01]": {"impressions": 244.0, "position": 1.8}, "W10 [03/02-03/08]": {"impressions": 233.0, "position": 1.3}, "W11 [03/09-03/15]": {"impressions": 376.0, "position": 1.3}, "W12 [03/16-03/22]": {"impressions": 204.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 227.0, "position": 1.3}, "W14 [03/30-04/05]": {"impressions": 139.0, "position": 1.2}, "W15 [04/06-04/12]": {"impressions": 174.0, "position": 1.2}, "W16 [04/13-04/19]": {"impressions": 142.0, "position": 1.4}}}, {"category": "قیمت", "keyword": "قیمت بازار محصولات مدیران خودرو", "category_keyword": "قیمت بازار محصولات مدیران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 1.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 11.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 21.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 66.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 53.0, "position": 1.8}, "W08 [02/19-02/25]": {"impressions": 25.0, "position": 1.8}, "W09 [02/26-03/01]": {"impressions": 12.0, "position": 1.8}, "W10 [03/02-03/08]": {"impressions": 13.0, "position": 1.3}, "W11 [03/09-03/15]": {"impressions": 62.0, "position": 1.3}, "W12 [03/16-03/22]": {"impressions": 18.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 30.0, "position": 1.4}, "W14 [03/30-04/05]": {"impressions": 24.0, "position": 1.4}, "W15 [04/06-04/12]": {"impressions": 22.0, "position": 1.3}, "W16 [04/13-04/19]": {"impressions": 5.0, "position": 1.2}}}, {"category": "قیمت", "keyword": "قیمت روز مدیران خودرو", "category_keyword": "قیمت روز مدیران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 1.0, "position": 2.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 35.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 160.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 298.0, "position": 1.6}, "W07 [02/12-02/18]": {"impressions": 308.0, "position": 3.0}, "W08 [02/19-02/25]": {"impressions": 211.0, "position": 1.9}, "W09 [02/26-03/01]": {"impressions": 164.0, "position": 1.9}, "W10 [03/02-03/08]": {"impressions": 135.0, "position": 1.4}, "W11 [03/09-03/15]": {"impressions": 305.0, "position": 1.3}, "W12 [03/16-03/22]": {"impressions": 150.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 180.0, "position": 1.4}, "W14 [03/30-04/05]": {"impressions": 107.0, "position": 1.6}, "W15 [04/06-04/12]": {"impressions": 111.0, "position": 1.5}, "W16 [04/13-04/19]": {"impressions": 83.0, "position": 1.4}}}, {"category": "قیمت", "keyword": "قیمت جدید محصولات مدیران خودرو", "category_keyword": "قیمت جدید محصولات مدیران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 1.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 2.0, "position": 3.0}, "W04 [01/22-01/28]": {"impressions": 107.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 222.0, "position": 1.9}, "W06 [02/05-02/11]": {"impressions": 254.0, "position": 1.6}, "W07 [02/12-02/18]": {"impressions": 105.0, "position": 3.3}, "W08 [02/19-02/25]": {"impressions": 309.0, "position": 2.1}, "W09 [02/26-03/01]": {"impressions": 227.0, "position": 1.9}, "W10 [03/02-03/08]": {"impressions": 209.0, "position": 1.6}, "W11 [03/09-03/15]": {"impressions": 1974.0, "position": 3.4}, "W12 [03/16-03/22]": {"impressions": 329.0, "position": 1.5}, "W13 [03/23-03/29]": {"impressions": 236.0, "position": 1.7}, "W14 [03/30-04/05]": {"impressions": 147.0, "position": 1.5}, "W15 [04/06-04/12]": {"impressions": 97.0, "position": 2.1}, "W16 [04/13-04/19]": {"impressions": 131.0, "position": 1.5}}}, {"category": "قیمت", "keyword": "قیمت محصولات کرمان موتور", "category_keyword": "قیمت محصولات کرمان موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 1427.0, "position": 6.3}, "W05 [01/29-02/04]": {"impressions": 298.0, "position": 4.9}, "W06 [02/05-02/11]": {"impressions": 60.0, "position": 9.7}, "W07 [02/12-02/18]": {"impressions": 580.0, "position": 7.8}, "W08 [02/19-02/25]": {"impressions": 110.0, "position": 6.3}, "W09 [02/26-03/01]": {"impressions": 31.0, "position": 7.0}, "W10 [03/02-03/08]": {"impressions": 58.0, "position": 8.0}, "W11 [03/09-03/15]": {"impressions": 337.0, "position": 8.0}, "W12 [03/16-03/22]": {"impressions": 386.0, "position": 8.6}, "W13 [03/23-03/29]": {"impressions": 559.0, "position": 7.7}, "W14 [03/30-04/05]": {"impressions": 46.0, "position": 6.8}, "W15 [04/06-04/12]": {"impressions": 117.0, "position": 7.5}, "W16 [04/13-04/19]": {"impressions": 8.0, "position": 6.4}}}, {"category": "قیمت", "keyword": "قیمت جدید محصولات کرمان موتور", "category_keyword": "قیمت جدید محصولات کرمان موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 26.0, "position": 4.4}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 4.0, "position": 6.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 3.0, "position": 6.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 2.0, "position": 6.0}, "W11 [03/09-03/15]": {"impressions": 34.0, "position": 9.0}, "W12 [03/16-03/22]": {"impressions": 32.0, "position": 8.1}, "W13 [03/23-03/29]": {"impressions": 89.0, "position": 8.3}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 21.0, "position": 7.0}, "W16 [04/13-04/19]": {"impressions": 3.0, "position": 8.0}}}, {"category": "قیمت", "keyword": "قیمت روز محصولات کرمان موتور", "category_keyword": "قیمت روز محصولات کرمان موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 25.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 97.0, "position": 2.4}, "W06 [02/05-02/11]": {"impressions": 182.0, "position": 2.8}, "W07 [02/12-02/18]": {"impressions": 221.0, "position": 3.0}, "W08 [02/19-02/25]": {"impressions": 126.0, "position": 2.0}, "W09 [02/26-03/01]": {"impressions": 108.0, "position": 2.1}, "W10 [03/02-03/08]": {"impressions": 105.0, "position": 2.0}, "W11 [03/09-03/15]": {"impressions": 77.0, "position": 1.9}, "W12 [03/16-03/22]": {"impressions": 66.0, "position": 1.8}, "W13 [03/23-03/29]": {"impressions": 135.0, "position": 1.9}, "W14 [03/30-04/05]": {"impressions": 71.0, "position": 1.8}, "W15 [04/06-04/12]": {"impressions": 64.0, "position": 1.7}, "W16 [04/13-04/19]": {"impressions": 74.0, "position": 1.8}}}, {"category": "قیمت", "keyword": "قیمت کارخانه کرمان موتور", "category_keyword": "قیمت کارخانه کرمان موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 52.0, "position": 8.0}, "W05 [01/29-02/04]": {"impressions": 10.0, "position": 8.7}, "W06 [02/05-02/11]": {"impressions": 3.0, "position": 7.3}, "W07 [02/12-02/18]": {"impressions": 4.0, "position": 9.5}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 54.0, "position": 8.1}, "W10 [03/02-03/08]": {"impressions": 24.0, "position": 7.5}, "W11 [03/09-03/15]": {"impressions": 100.0, "position": 7.6}, "W12 [03/16-03/22]": {"impressions": 68.0, "position": 8.1}, "W13 [03/23-03/29]": {"impressions": 69.0, "position": 8.4}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 15.0, "position": 9.0}, "W16 [04/13-04/19]": {"impressions": 0.0, "position": 0.0}}}, {"category": "قیمت", "keyword": "قیمت محصولات بهمن موتور", "category_keyword": "قیمت محصولات بهمن موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 11.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 1346.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 3173.0, "position": 1.6}, "W06 [02/05-02/11]": {"impressions": 1853.0, "position": 3.2}, "W07 [02/12-02/18]": {"impressions": 1926.0, "position": 5.5}, "W08 [02/19-02/25]": {"impressions": 8296.0, "position": 6.0}, "W09 [02/26-03/01]": {"impressions": 1966.0, "position": 3.8}, "W10 [03/02-03/08]": {"impressions": 3007.0, "position": 2.1}, "W11 [03/09-03/15]": {"impressions": 1041.0, "position": 1.9}, "W12 [03/16-03/22]": {"impressions": 2025.0, "position": 1.6}, "W13 [03/23-03/29]": {"impressions": 958.0, "position": 1.4}, "W14 [03/30-04/05]": {"impressions": 737.0, "position": 1.4}, "W15 [04/06-04/12]": {"impressions": 665.0, "position": 1.5}, "W16 [04/13-04/19]": {"impressions": 560.0, "position": 1.6}}}, {"category": "قیمت", "keyword": "قیمت محصولات بهمن موتور در کارخانه و بازار", "category_keyword": "قیمت محصولات بهمن موتور در کارخانه و بازار", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 6.0, "position": 2.0}, "W04 [01/22-01/28]": {"impressions": 276.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 853.0, "position": 1.5}, "W06 [02/05-02/11]": {"impressions": 598.0, "position": 2.6}, "W07 [02/12-02/18]": {"impressions": 539.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 736.0, "position": 2.8}, "W09 [02/26-03/01]": {"impressions": 348.0, "position": 2.7}, "W10 [03/02-03/08]": {"impressions": 712.0, "position": 1.5}, "W11 [03/09-03/15]": {"impressions": 416.0, "position": 1.3}, "W12 [03/16-03/22]": {"impressions": 837.0, "position": 1.2}, "W13 [03/23-03/29]": {"impressions": 389.0, "position": 1.2}, "W14 [03/30-04/05]": {"impressions": 315.0, "position": 1.2}, "W15 [04/06-04/12]": {"impressions": 299.0, "position": 1.2}, "W16 [04/13-04/19]": {"impressions": 185.0, "position": 1.2}}}, {"category": "قیمت", "keyword": "قیمت روز محصولات بهمن موتور", "category_keyword": "قیمت روز محصولات بهمن موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 4.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 15.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 17.0, "position": 2.0}, "W07 [02/12-02/18]": {"impressions": 82.0, "position": 3.0}, "W08 [02/19-02/25]": {"impressions": 49.0, "position": 4.0}, "W09 [02/26-03/01]": {"impressions": 48.0, "position": 4.0}, "W10 [03/02-03/08]": {"impressions": 60.0, "position": 2.0}, "W11 [03/09-03/15]": {"impressions": 38.0, "position": 2.0}, "W12 [03/16-03/22]": {"impressions": 115.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 42.0, "position": 1.6}, "W14 [03/30-04/05]": {"impressions": 18.0, "position": 1.4}, "W15 [04/06-04/12]": {"impressions": 25.0, "position": 1.5}, "W16 [04/13-04/19]": {"impressions": 31.0, "position": 1.6}}}, {"category": "قیمت", "keyword": "قیمت خودروهای بهمن موتور", "category_keyword": "قیمت خودروهای بهمن موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 14.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 21.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 36.0, "position": 2.1}, "W07 [02/12-02/18]": {"impressions": 57.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 49.0, "position": 4.7}, "W09 [02/26-03/01]": {"impressions": 34.0, "position": 3.0}, "W10 [03/02-03/08]": {"impressions": 88.0, "position": 2.0}, "W11 [03/09-03/15]": {"impressions": 40.0, "position": 2.0}, "W12 [03/16-03/22]": {"impressions": 88.0, "position": 1.7}, "W13 [03/23-03/29]": {"impressions": 28.0, "position": 1.4}, "W14 [03/30-04/05]": {"impressions": 37.0, "position": 1.7}, "W15 [04/06-04/12]": {"impressions": 29.0, "position": 1.7}, "W16 [04/13-04/19]": {"impressions": 26.0, "position": 1.8}}}], "city_keywords": [{"category": "شهر", "keyword": "فروش خودرو در شیراز", "seed_keyword": "فروش خودرو در شیراز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 0.0, "position": 0.0}, "W12 [03/16-03/22]": {"impressions": 0.0, "position": 0.0}, "W13 [03/23-03/29]": {"impressions": 1.0, "position": 5.0}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 3.0, "position": 3.7}, "W16 [04/13-04/19]": {"impressions": 0.0, "position": 0.0}}}, {"category": "شهر", "keyword": "خودرو ۴۵ شیراز", "seed_keyword": "خودرو ۴۵ شیراز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 2.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 37.0, "position": 1.2}, "W05 [01/29-02/04]": {"impressions": 124.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 175.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 135.0, "position": 1.1}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 147.0, "position": 1.3}, "W10 [03/02-03/08]": {"impressions": 210.0, "position": 1.4}, "W11 [03/09-03/15]": {"impressions": 278.0, "position": 1.4}, "W12 [03/16-03/22]": {"impressions": 291.0, "position": 1.2}, "W13 [03/23-03/29]": {"impressions": 258.0, "position": 1.2}, "W14 [03/30-04/05]": {"impressions": 178.0, "position": 1.1}, "W15 [04/06-04/12]": {"impressions": 229.0, "position": 1.2}, "W16 [04/13-04/19]": {"impressions": 292.0, "position": 1.2}}}, {"category": "شهر", "keyword": "خودرو 45 شیراز", "seed_keyword": "خودرو 45 شیراز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 1.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 8.0, "position": 1.3}, "W05 [01/29-02/04]": {"impressions": 50.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 56.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 53.0, "position": 1.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 59.0, "position": 1.6}, "W10 [03/02-03/08]": {"impressions": 85.0, "position": 1.3}, "W11 [03/09-03/15]": {"impressions": 173.0, "position": 1.5}, "W12 [03/16-03/22]": {"impressions": 122.0, "position": 1.6}, "W13 [03/23-03/29]": {"impressions": 144.0, "position": 1.1}, "W14 [03/30-04/05]": {"impressions": 144.0, "position": 1.3}, "W15 [04/06-04/12]": {"impressions": 169.0, "position": 1.3}, "W16 [04/13-04/19]": {"impressions": 187.0, "position": 1.1}}}, {"category": "شهر", "keyword": "فروش خودرو شیراز", "seed_keyword": "فروش خودرو شیراز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 1.0, "position": 6.0}, "W11 [03/09-03/15]": {"impressions": 5.0, "position": 2.6}, "W12 [03/16-03/22]": {"impressions": 1.0, "position": 5.0}, "W13 [03/23-03/29]": {"impressions": 0.0, "position": 0.0}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 3.0, "position": 2.7}, "W16 [04/13-04/19]": {"impressions": 3.0, "position": 4.0}}}, {"category": "شهر", "keyword": "سایت خودرو ۴۵ شیراز", "seed_keyword": "سایت خودرو ۴۵ شیراز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 0.0, "position": 0.0}, "W12 [03/16-03/22]": {"impressions": 8.0, "position": 1.1}, "W13 [03/23-03/29]": {"impressions": 2.0, "position": 1.0}, "W14 [03/30-04/05]": {"impressions": 5.0, "position": 1.2}, "W15 [04/06-04/12]": {"impressions": 3.0, "position": 1.0}, "W16 [04/13-04/19]": {"impressions": 2.0, "position": 1.0}}}, {"category": "شهر", "keyword": "فروش خودرو در اصفهان", "seed_keyword": "فروش خودرو در اصفهان", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 0.0, "position": 0.0}, "W12 [03/16-03/22]": {"impressions": 0.0, "position": 0.0}, "W13 [03/23-03/29]": {"impressions": 0.0, "position": 0.0}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 12.0, "position": 3.8}, "W16 [04/13-04/19]": {"impressions": 3.0, "position": 5.7}}}, {"category": "شهر", "keyword": "خودرو ۴۵ اصفهان", "seed_keyword": "خودرو ۴۵ اصفهان", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 2.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 29.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 86.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 91.0, "position": 1.2}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 330.0, "position": 1.5}, "W12 [03/16-03/22]": {"impressions": 0.0, "position": 0.0}, "W13 [03/23-03/29]": {"impressions": 310.0, "position": 1.2}, "W14 [03/30-04/05]": {"impressions": 167.0, "position": 1.3}, "W15 [04/06-04/12]": {"impressions": 245.0, "position": 1.2}, "W16 [04/13-04/19]": {"impressions": 247.0, "position": 1.2}}}, {"category": "شهر", "keyword": "سایت خودرو ۴۵ اصفهان", "seed_keyword": "سایت خودرو ۴۵ اصفهان", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 0.0, "position": 0.0}, "W12 [03/16-03/22]": {"impressions": 0.0, "position": 0.0}, "W13 [03/23-03/29]": {"impressions": 24.0, "position": 1.1}, "W14 [03/30-04/05]": {"impressions": 5.0, "position": 1.0}, "W15 [04/06-04/12]": {"impressions": 7.0, "position": 1.0}, "W16 [04/13-04/19]": {"impressions": 6.0, "position": 1.0}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در تهران", "seed_keyword": "صفحه لندینگ فروش خودرو در تهران", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 1923.0, "position": 3.0}, "W08 [02/19-02/25]": {"impressions": 6041.0, "position": 5.0}, "W09 [02/26-03/01]": {"impressions": 8685.0, "position": 7.0}, "W10 [03/02-03/08]": {"impressions": 17775.0, "position": 7.2}, "W11 [03/09-03/15]": {"impressions": 12810.0, "position": 7.0}, "W12 [03/16-03/22]": {"impressions": 13080.0, "position": 6.4}, "W13 [03/23-03/29]": {"impressions": 220.0, "position": 6.2}, "W14 [03/30-04/05]": {"impressions": 18511.0, "position": 5.2}, "W15 [04/06-04/12]": {"impressions": 15378.0, "position": 3.8}, "W16 [04/13-04/19]": {"impressions": 20268.0, "position": 3.5}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در کرج", "seed_keyword": "صفحه لندینگ فروش خودرو در کرج", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 22.0, "position": 3.6}, "W04 [01/22-01/28]": {"impressions": 681.0, "position": 3.3}, "W05 [01/29-02/04]": {"impressions": 2859.0, "position": 3.9}, "W06 [02/05-02/11]": {"impressions": 6311.0, "position": 2.7}, "W07 [02/12-02/18]": {"impressions": 4607.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 4288.0, "position": 2.4}, "W09 [02/26-03/01]": {"impressions": 3069.0, "position": 2.7}, "W10 [03/02-03/08]": {"impressions": 3720.0, "position": 2.5}, "W11 [03/09-03/15]": {"impressions": 3816.0, "position": 2.5}, "W12 [03/16-03/22]": {"impressions": 3370.0, "position": 2.8}, "W13 [03/23-03/29]": {"impressions": 341.0, "position": 2.8}, "W14 [03/30-04/05]": {"impressions": 2578.0, "position": 2.8}, "W15 [04/06-04/12]": {"impressions": 3236.0, "position": 2.6}, "W16 [04/13-04/19]": {"impressions": 2898.0, "position": 2.6}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در مشهد", "seed_keyword": "صفحه لندینگ فروش خودرو در مشهد", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 25.0, "position": 3.7}, "W04 [01/22-01/28]": {"impressions": 1475.0, "position": 2.1}, "W05 [01/29-02/04]": {"impressions": 5713.0, "position": 2.0}, "W06 [02/05-02/11]": {"impressions": 8710.0, "position": 1.7}, "W07 [02/12-02/18]": {"impressions": 6305.0, "position": 1.7}, "W08 [02/19-02/25]": {"impressions": 5226.0, "position": 1.6}, "W09 [02/26-03/01]": {"impressions": 4332.0, "position": 1.6}, "W10 [03/02-03/08]": {"impressions": 5910.0, "position": 1.7}, "W11 [03/09-03/15]": {"impressions": 6404.0, "position": 1.7}, "W12 [03/16-03/22]": {"impressions": 5556.0, "position": 1.8}, "W13 [03/23-03/29]": {"impressions": 737.0, "position": 1.6}, "W14 [03/30-04/05]": {"impressions": 5499.0, "position": 1.6}, "W15 [04/06-04/12]": {"impressions": 6650.0, "position": 1.6}, "W16 [04/13-04/19]": {"impressions": 5664.0, "position": 1.7}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در تبریز", "seed_keyword": "صفحه لندینگ فروش خودرو در تبریز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 1753.0, "position": 2.4}, "W06 [02/05-02/11]": {"impressions": 4154.0, "position": 1.9}, "W07 [02/12-02/18]": {"impressions": 3505.0, "position": 2.2}, "W08 [02/19-02/25]": {"impressions": 3220.0, "position": 2.0}, "W09 [02/26-03/01]": {"impressions": 2393.0, "position": 1.9}, "W10 [03/02-03/08]": {"impressions": 3255.0, "position": 1.7}, "W11 [03/09-03/15]": {"impressions": 3588.0, "position": 1.7}, "W12 [03/16-03/22]": {"impressions": 3419.0, "position": 2.0}, "W13 [03/23-03/29]": {"impressions": 350.0, "position": 2.0}, "W14 [03/30-04/05]": {"impressions": 2600.0, "position": 1.8}, "W15 [04/06-04/12]": {"impressions": 3478.0, "position": 1.6}, "W16 [04/13-04/19]": {"impressions": 3457.0, "position": 1.8}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در اهواز", "seed_keyword": "صفحه لندینگ فروش خودرو در اهواز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 15.0, "position": 7.0}, "W04 [01/22-01/28]": {"impressions": 804.0, "position": 2.0}, "W05 [01/29-02/04]": {"impressions": 2823.0, "position": 1.8}, "W06 [02/05-02/11]": {"impressions": 4515.0, "position": 1.7}, "W07 [02/12-02/18]": {"impressions": 3485.0, "position": 1.7}, "W08 [02/19-02/25]": {"impressions": 3157.0, "position": 1.6}, "W09 [02/26-03/01]": {"impressions": 2953.0, "position": 1.7}, "W10 [03/02-03/08]": {"impressions": 3612.0, "position": 1.6}, "W11 [03/09-03/15]": {"impressions": 3864.0, "position": 1.7}, "W12 [03/16-03/22]": {"impressions": 3846.0, "position": 1.8}, "W13 [03/23-03/29]": {"impressions": 323.0, "position": 1.7}, "W14 [03/30-04/05]": {"impressions": 3468.0, "position": 1.7}, "W15 [04/06-04/12]": {"impressions": 4708.0, "position": 1.6}, "W16 [04/13-04/19]": {"impressions": 4424.0, "position": 1.8}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در رشت", "seed_keyword": "صفحه لندینگ فروش خودرو در رشت", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 948.0, "position": 2.3}, "W06 [02/05-02/11]": {"impressions": 2258.0, "position": 2.1}, "W07 [02/12-02/18]": {"impressions": 1616.0, "position": 2.4}, "W08 [02/19-02/25]": {"impressions": 1377.0, "position": 2.4}, "W09 [02/26-03/01]": {"impressions": 1174.0, "position": 2.1}, "W10 [03/02-03/08]": {"impressions": 1347.0, "position": 1.9}, "W11 [03/09-03/15]": {"impressions": 1319.0, "position": 2.1}, "W12 [03/16-03/22]": {"impressions": 1374.0, "position": 2.3}, "W13 [03/23-03/29]": {"impressions": 224.0, "position": 1.8}, "W14 [03/30-04/05]": {"impressions": 1195.0, "position": 1.7}, "W15 [04/06-04/12]": {"impressions": 1427.0, "position": 2.1}, "W16 [04/13-04/19]": {"impressions": 1487.0, "position": 2.4}}}]}, "sectionTotals": {"seed_keywords": {"W02 [01/08-01/14]": {"impressions": 1236.0, "position": 3.16084142394822}, "W03 [01/15-01/21]": {"impressions": 1912.0, "position": 3.020449790794979}, "W04 [01/22-01/28]": {"impressions": 101094.0, "position": 3.090400023740281}, "W05 [01/29-01/04]": {"impressions": 0, "position": null}, "W06 [02/05-02/11]": {"impressions": 752781.0, "position": 4.902924223645391}, "W07 [02/12-02/18]": {"impressions": 643736.0, "position": 3.553797830166404}, "W08 [02/19-02/25]": {"impressions": 350020.0, "position": 3.9099020055996796}, "W09 [02/26-02/01]": {"impressions": 0, "position": null}, "W10 [03/02-03/08]": {"impressions": 345747.0, "position": 4.833087806980249}, "W11 [03/09-03/15]": {"impressions": 343545.0, "position": 5.3536275014918}, "W12 [03/16-03/22]": {"impressions": 303363.0, "position": 5.773902552387733}, "W13 [03/23-03/29]": {"impressions": 606858.0, "position": 6.320820686223135}, "W14 [03/30-04/05]": {"impressions": 332763.0, "position": 6.05671694268894}, "W15 [04/06-04/12]": {"impressions": 362715.0, "position": 6.247121569276152}, "W16 [04/13-04/19]": {"impressions": 266929.0, "position": 5.977589171652387}}, "category_keywords": {"W02 [01/08-01/14]": {"impressions": 58.0, "position": 2.7913793103448272}, "W03 [01/15-01/21]": {"impressions": 142.0, "position": 2.5169014084507046}, "W04 [01/22-01/28]": {"impressions": 26516.0, "position": 1.950407301252074}, "W05 [01/29-01/04]": {"impressions": 0, "position": null}, "W06 [02/05-02/11]": {"impressions": 72115.0, "position": 4.073074949733064}, "W07 [02/12-02/18]": {"impressions": 91034.0, "position": 3.091047301008414}, "W08 [02/19-02/25]": {"impressions": 58717.0, "position": 2.8888618287719052}, "W09 [02/26-02/01]": {"impressions": 0, "position": null}, "W10 [03/02-03/08]": {"impressions": 38824.0, "position": 3.3715407995054596}, "W11 [03/09-03/15]": {"impressions": 34306.0, "position": 3.280006412872385}, "W12 [03/16-03/22]": {"impressions": 27381.0, "position": 3.390599320696834}, "W13 [03/23-03/29]": {"impressions": 33558.0, "position": 2.9699982120507777}, "W14 [03/30-04/05]": {"impressions": 23723.0, "position": 3.067171099776588}, "W15 [04/06-04/12]": {"impressions": 17729.0, "position": 2.6382593490890636}, "W16 [04/13-04/19]": {"impressions": 15296.0, "position": 2.4936453974895394}}, "city_keywords": {"W02 [01/08-01/14]": {"impressions": 0, "position": null}, "W03 [01/15-01/21]": {"impressions": 67.0, "position": 4.204477611940298}, "W04 [01/22-01/28]": {"impressions": 3034.0, "position": 2.3192485168094925}, "W05 [01/29-01/04]": {"impressions": 0, "position": null}, "W06 [02/05-02/11]": {"impressions": 26179.0, "position": 2.0020130639061846}, "W07 [02/12-02/18]": {"impressions": 21629.0, "position": 2.1990475750150265}, "W08 [02/19-02/25]": {"impressions": 23309.0, "position": 2.730867905101034}, "W09 [02/26-02/01]": {"impressions": 0, "position": null}, "W10 [03/02-03/08]": {"impressions": 35915.0, "position": 4.499777251844633}, "W11 [03/09-03/15]": {"impressions": 32587.0, "position": 3.887801884186946}, "W12 [03/16-03/22]": {"impressions": 31067.0, "position": 3.8828338751730134}, "W13 [03/23-03/29]": {"impressions": 2934.0, "position": 2.0530674846625767}, "W14 [03/30-04/05]": {"impressions": 34350.0, "position": 3.653339155749636}, "W15 [04/06-04/12]": {"impressions": 35548.0, "position": 2.6569033419601666}, "W16 [04/13-04/19]": {"impressions": 38938.0, "position": 2.7414299655863172}}}, "categoryGroups": [{"key": "forosh", "title": "دسته‌بندی فروش", "rows": [{"category": "فروش", "keyword": "فروش خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 36.0, "position": 5.0}, "W03 [01/15-01/21]": {"impressions": 57.0, "position": 1.5}, "W04 [01/22-01/28]": {"impressions": 926.0, "position": 3.1}, "W05 [01/29-02/04]": {"impressions": 2431.0, "position": 3.1}, "W06 [02/05-02/11]": {"impressions": 3673.0, "position": 3.8}, "W07 [02/12-02/18]": {"impressions": 5222.0, "position": 4.6}, "W08 [02/19-02/25]": {"impressions": 3484.0, "position": 5.7}, "W09 [02/26-03/01]": {"impressions": 3696.0, "position": 5.4}, "W10 [03/02-03/08]": {"impressions": 3400.0, "position": 5.2}, "W11 [03/09-03/15]": {"impressions": 2623.0, "position": 5.6}, "W12 [03/16-03/22]": {"impressions": 2659.0, "position": 5.1}, "W13 [03/23-03/29]": {"impressions": 2319.0, "position": 5.5}, "W14 [03/30-04/05]": {"impressions": 2183.0, "position": 4.9}, "W15 [04/06-04/12]": {"impressions": 2598.0, "position": 5.3}, "W16 [04/13-04/19]": {"impressions": 2125.0, "position": 4.6}}}, {"category": "فروش", "keyword": "فروش ماشین", "metrics": {"W02 [01/08-01/14]": {"impressions": 13.0, "position": 2.4}, "W03 [01/15-01/21]": {"impressions": 11.0, "position": 4.1}, "W04 [01/22-01/28]": {"impressions": 337.0, "position": 2.3}, "W05 [01/29-02/04]": {"impressions": 738.0, "position": 2.5}, "W06 [02/05-02/11]": {"impressions": 959.0, "position": 3.2}, "W07 [02/12-02/18]": {"impressions": 1157.0, "position": 3.7}, "W08 [02/19-02/25]": {"impressions": 886.0, "position": 4.5}, "W09 [02/26-03/01]": {"impressions": 1099.0, "position": 4.2}, "W10 [03/02-03/08]": {"impressions": 796.0, "position": 3.8}, "W11 [03/09-03/15]": {"impressions": 745.0, "position": 4.4}, "W12 [03/16-03/22]": {"impressions": 655.0, "position": 4.3}, "W13 [03/23-03/29]": {"impressions": 700.0, "position": 4.4}, "W14 [03/30-04/05]": {"impressions": 544.0, "position": 4.3}, "W15 [04/06-04/12]": {"impressions": 560.0, "position": 4.5}, "W16 [04/13-04/19]": {"impressions": 537.0, "position": 4.8}}}, {"category": "فروش", "keyword": "فروش خودرو کارکرده", "metrics": {"W02 [01/08-01/14]": {"impressions": 3.0, "position": 1.7}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 51.0, "position": 1.2}, "W05 [01/29-02/04]": {"impressions": 98.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 166.0, "position": 2.3}, "W07 [02/12-02/18]": {"impressions": 149.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 140.0, "position": 3.0}, "W09 [02/26-03/01]": {"impressions": 160.0, "position": 2.2}, "W10 [03/02-03/08]": {"impressions": 193.0, "position": 2.4}, "W11 [03/09-03/15]": {"impressions": 198.0, "position": 2.3}, "W12 [03/16-03/22]": {"impressions": 220.0, "position": 2.1}, "W13 [03/23-03/29]": {"impressions": 243.0, "position": 2.3}, "W14 [03/30-04/05]": {"impressions": 196.0, "position": 2.6}, "W15 [04/06-04/12]": {"impressions": 193.0, "position": 2.4}, "W16 [04/13-04/19]": {"impressions": 138.0, "position": 2.3}}}, {"category": "فروش", "keyword": "فروش فوری خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 5.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 5.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 122.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 228.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 339.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 555.0, "position": 2.0}, "W08 [02/19-02/25]": {"impressions": 423.0, "position": 1.0}, "W09 [02/26-03/01]": {"impressions": 330.0, "position": 1.0}, "W10 [03/02-03/08]": {"impressions": 399.0, "position": 1.0}, "W11 [03/09-03/15]": {"impressions": 345.0, "position": 1.4}, "W12 [03/16-03/22]": {"impressions": 310.0, "position": 1.5}, "W13 [03/23-03/29]": {"impressions": 287.0, "position": 1.6}, "W14 [03/30-04/05]": {"impressions": 221.0, "position": 1.5}, "W15 [04/06-04/12]": {"impressions": 229.0, "position": 1.4}, "W16 [04/13-04/19]": {"impressions": 151.0, "position": 1.2}}}, {"category": "فروش", "keyword": "فروش فوری خودرو کارکرده", "metrics": {"W02 [01/08-01/14]": {"impressions": 2.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 43.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 96.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 136.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 175.0, "position": 1.1}, "W08 [02/19-02/25]": {"impressions": 155.0, "position": 1.1}, "W09 [02/26-03/01]": {"impressions": 132.0, "position": 1.1}, "W10 [03/02-03/08]": {"impressions": 160.0, "position": 1.1}, "W11 [03/09-03/15]": {"impressions": 176.0, "position": 1.2}, "W12 [03/16-03/22]": {"impressions": 158.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 243.0, "position": 1.4}, "W14 [03/30-04/05]": {"impressions": 172.0, "position": 1.3}, "W15 [04/06-04/12]": {"impressions": 261.0, "position": 1.3}, "W16 [04/13-04/19]": {"impressions": 153.0, "position": 1.3}}}, {"category": "فروش", "keyword": "فروش ماشین دست دوم", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 13.0, "position": 1.2}, "W05 [01/29-02/04]": {"impressions": 41.0, "position": 1.2}, "W06 [02/05-02/11]": {"impressions": 46.0, "position": 1.2}, "W07 [02/12-02/18]": {"impressions": 53.0, "position": 1.8}, "W08 [02/19-02/25]": {"impressions": 88.0, "position": 2.7}, "W09 [02/26-03/01]": {"impressions": 29.0, "position": 2.4}, "W10 [03/02-03/08]": {"impressions": 42.0, "position": 2.3}, "W11 [03/09-03/15]": {"impressions": 36.0, "position": 2.1}, "W12 [03/16-03/22]": {"impressions": 23.0, "position": 3.0}, "W13 [03/23-03/29]": {"impressions": 50.0, "position": 2.4}, "W14 [03/30-04/05]": {"impressions": 16.0, "position": 2.9}, "W15 [04/06-04/12]": {"impressions": 20.0, "position": 2.2}, "W16 [04/13-04/19]": {"impressions": 7.0, "position": 1.7}}}, {"category": "فروش", "keyword": "سایت فروش خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 4.0, "position": 1.3}, "W04 [01/22-01/28]": {"impressions": 76.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 304.0, "position": 1.4}, "W06 [02/05-02/11]": {"impressions": 487.0, "position": 2.0}, "W07 [02/12-02/18]": {"impressions": 760.0, "position": 2.7}, "W08 [02/19-02/25]": {"impressions": 471.0, "position": 2.7}, "W09 [02/26-03/01]": {"impressions": 533.0, "position": 2.5}, "W10 [03/02-03/08]": {"impressions": 417.0, "position": 1.9}, "W11 [03/09-03/15]": {"impressions": 365.0, "position": 2.6}, "W12 [03/16-03/22]": {"impressions": 291.0, "position": 2.2}, "W13 [03/23-03/29]": {"impressions": 441.0, "position": 2.3}, "W14 [03/30-04/05]": {"impressions": 306.0, "position": 2.2}, "W15 [04/06-04/12]": {"impressions": 328.0, "position": 2.5}, "W16 [04/13-04/19]": {"impressions": 258.0, "position": 2.7}}}, {"category": "فروش", "keyword": "سایت فروش ماشین", "metrics": {"W02 [01/08-01/14]": {"impressions": 1.0, "position": 2.0}, "W03 [01/15-01/21]": {"impressions": 1.0, "position": 2.0}, "W04 [01/22-01/28]": {"impressions": 54.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 205.0, "position": 1.3}, "W06 [02/05-02/11]": {"impressions": 229.0, "position": 2.2}, "W07 [02/12-02/18]": {"impressions": 262.0, "position": 2.4}, "W08 [02/19-02/25]": {"impressions": 238.0, "position": 2.8}, "W09 [02/26-03/01]": {"impressions": 277.0, "position": 2.3}, "W10 [03/02-03/08]": {"impressions": 195.0, "position": 2.2}, "W11 [03/09-03/15]": {"impressions": 252.0, "position": 2.5}, "W12 [03/16-03/22]": {"impressions": 177.0, "position": 2.1}, "W13 [03/23-03/29]": {"impressions": 204.0, "position": 2.3}, "W14 [03/30-04/05]": {"impressions": 154.0, "position": 2.0}, "W15 [04/06-04/12]": {"impressions": 193.0, "position": 2.0}, "W16 [04/13-04/19]": {"impressions": 153.0, "position": 2.2}}}, {"category": "فروش", "keyword": "خریدار خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 1.0, "position": 18.0}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 7.3}, "W04 [01/22-01/28]": {"impressions": 7.0, "position": 8.0}, "W05 [01/29-02/04]": {"impressions": 9.0, "position": 4.6}, "W06 [02/05-02/11]": {"impressions": 5.0, "position": 6.4}, "W07 [02/12-02/18]": {"impressions": 38.0, "position": 7.4}, "W08 [02/19-02/25]": {"impressions": 65.0, "position": 8.7}, "W09 [02/26-03/01]": {"impressions": 14.0, "position": 6.6}, "W10 [03/02-03/08]": {"impressions": 34.0, "position": 6.5}, "W11 [03/09-03/15]": {"impressions": 13.0, "position": 3.8}, "W12 [03/16-03/22]": {"impressions": 11.0, "position": 4.1}, "W13 [03/23-03/29]": {"impressions": 38.0, "position": 7.2}, "W14 [03/30-04/05]": {"impressions": 9.0, "position": 7.3}, "W15 [04/06-04/12]": {"impressions": 22.0, "position": 5.2}, "W16 [04/13-04/19]": {"impressions": 32.0, "position": 5.3}}}, {"category": "فروش", "keyword": "فروش ماشین پول لازم", "metrics": {"W02 [01/08-01/14]": {"impressions": 1.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 4.0, "position": 1.3}, "W05 [01/29-02/04]": {"impressions": 4.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 15.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 9.0, "position": 1.0}, "W08 [02/19-02/25]": {"impressions": 18.0, "position": 1.0}, "W09 [02/26-03/01]": {"impressions": 10.0, "position": 1.1}, "W10 [03/02-03/08]": {"impressions": 16.0, "position": 1.2}, "W11 [03/09-03/15]": {"impressions": 24.0, "position": 1.5}, "W12 [03/16-03/22]": {"impressions": 5.0, "position": 1.2}, "W13 [03/23-03/29]": {"impressions": 1.0, "position": 1.0}, "W14 [03/30-04/05]": {"impressions": 11.0, "position": 1.0}, "W15 [04/06-04/12]": {"impressions": 7.0, "position": 1.3}, "W16 [04/13-04/19]": {"impressions": 11.0, "position": 1.3}}}]}, {"key": "price", "title": "قیمت و تخمین قیمت", "rows": [{"category": "قیمت", "keyword": "قیمت خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 408.0, "position": 3.7}, "W03 [01/15-01/21]": {"impressions": 465.0, "position": 3.7}, "W04 [01/22-01/28]": {"impressions": 31751.0, "position": 3.9}, "W05 [01/29-02/04]": {"impressions": 76199.0, "position": 5.6}, "W06 [02/05-02/11]": {"impressions": 221148.0, "position": 6.7}, "W07 [02/12-02/18]": {"impressions": 233041.0, "position": 5.0}, "W08 [02/19-02/25]": {"impressions": 136301.0, "position": 5.0}, "W09 [02/26-03/01]": {"impressions": 130499.0, "position": 5.0}, "W10 [03/02-03/08]": {"impressions": 127031.0, "position": 5.9}, "W11 [03/09-03/15]": {"impressions": 111402.0, "position": 6.7}, "W12 [03/16-03/22]": {"impressions": 92275.0, "position": 7.1}, "W13 [03/23-03/29]": {"impressions": 197778.0, "position": 7.4}, "W14 [03/30-04/05]": {"impressions": 107497.0, "position": 7.3}, "W15 [04/06-04/12]": {"impressions": 117973.0, "position": 7.3}, "W16 [04/13-04/19]": {"impressions": 81489.0, "position": 7.2}}}, {"category": "قیمت", "keyword": "قیمت روز خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 383.0, "position": 3.3}, "W03 [01/15-01/21]": {"impressions": 716.0, "position": 3.0}, "W04 [01/22-01/28]": {"impressions": 32077.0, "position": 3.2}, "W05 [01/29-02/04]": {"impressions": 132070.0, "position": 4.1}, "W06 [02/05-02/11]": {"impressions": 371396.0, "position": 4.6}, "W07 [02/12-02/18]": {"impressions": 250796.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 122406.0, "position": 3.4}, "W09 [02/26-03/01]": {"impressions": 128091.0, "position": 4.3}, "W10 [03/02-03/08]": {"impressions": 145335.0, "position": 4.7}, "W11 [03/09-03/15]": {"impressions": 161271.0, "position": 5.3}, "W12 [03/16-03/22]": {"impressions": 147642.0, "position": 5.8}, "W13 [03/23-03/29]": {"impressions": 280681.0, "position": 6.4}, "W14 [03/30-04/05]": {"impressions": 155614.0, "position": 6.2}, "W15 [04/06-04/12]": {"impressions": 171320.0, "position": 6.5}, "W16 [04/13-04/19]": {"impressions": 126357.0, "position": 6.2}}}, {"category": "قیمت", "keyword": "قیمت خودرو امروز", "metrics": {"W02 [01/08-01/14]": {"impressions": 112.0, "position": 2.4}, "W03 [01/15-01/21]": {"impressions": 149.0, "position": 2.6}, "W04 [01/22-01/28]": {"impressions": 5390.0, "position": 3.5}, "W05 [01/29-02/04]": {"impressions": 16459.0, "position": 3.6}, "W06 [02/05-02/11]": {"impressions": 56564.0, "position": 4.9}, "W07 [02/12-02/18]": {"impressions": 51183.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 26063.0, "position": 3.98}, "W09 [02/26-03/01]": {"impressions": 20055.0, "position": 3.91}, "W10 [03/02-03/08]": {"impressions": 25722.0, "position": 3.8}, "W11 [03/09-03/15]": {"impressions": 26439.0, "position": 4.0}, "W12 [03/16-03/22]": {"impressions": 22853.0, "position": 5.0}, "W13 [03/23-03/29]": {"impressions": 71433.0, "position": 5.7}, "W14 [03/30-04/05]": {"impressions": 30924.0, "position": 5.0}, "W15 [04/06-04/12]": {"impressions": 32102.0, "position": 5.4}, "W16 [04/13-04/19]": {"impressions": 23079.0, "position": 5.5}}}, {"category": "قیمت", "keyword": "قیمت روز خودرو کارخانه و بازار", "metrics": {"W02 [01/08-01/14]": {"impressions": 153.0, "position": 2.4}, "W03 [01/15-01/21]": {"impressions": 210.0, "position": 2.6}, "W04 [01/22-01/28]": {"impressions": 19011.0, "position": 2.0}, "W05 [01/29-02/04]": {"impressions": 19975.0, "position": 2.3}, "W06 [02/05-02/11]": {"impressions": 31730.0, "position": 3.0}, "W07 [02/12-02/18]": {"impressions": 52870.0, "position": 2.2}, "W08 [02/19-02/25]": {"impressions": 20436.0, "position": 1.96}, "W09 [02/26-03/01]": {"impressions": 10231.0, "position": 1.54}, "W10 [03/02-03/08]": {"impressions": 12197.0, "position": 2.23}, "W11 [03/09-03/15]": {"impressions": 11618.0, "position": 1.92}, "W12 [03/16-03/22]": {"impressions": 9174.0, "position": 2.2}, "W13 [03/23-03/29]": {"impressions": 23630.0, "position": 2.2}, "W14 [03/30-04/05]": {"impressions": 12941.0, "position": 2.2}, "W15 [04/06-04/12]": {"impressions": 11861.0, "position": 2.1}, "W16 [04/13-04/19]": {"impressions": 9271.0, "position": 1.9}}}, {"category": "تخمین قیمت", "keyword": "تخمین قیمت خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 41.0, "position": 2.4}, "W03 [01/15-01/21]": {"impressions": 136.0, "position": 1.4}, "W04 [01/22-01/28]": {"impressions": 4680.0, "position": 1.3}, "W05 [01/29-02/04]": {"impressions": 16916.0, "position": 1.2}, "W06 [02/05-02/11]": {"impressions": 35354.0, "position": 1.3}, "W07 [02/12-02/18]": {"impressions": 27118.0, "position": 2.1}, "W08 [02/19-02/25]": {"impressions": 22440.0, "position": 2.5}, "W09 [02/26-03/01]": {"impressions": 20892.0, "position": 2.6}, "W10 [03/02-03/08]": {"impressions": 16974.0, "position": 2.6}, "W11 [03/09-03/15]": {"impressions": 15722.0, "position": 2.6}, "W12 [03/16-03/22]": {"impressions": 14879.0, "position": 2.5}, "W13 [03/23-03/29]": {"impressions": 15098.0, "position": 2.6}, "W14 [03/30-04/05]": {"impressions": 12091.0, "position": 2.7}, "W15 [04/06-04/12]": {"impressions": 13849.0, "position": 2.7}, "W16 [04/13-04/19]": {"impressions": 13262.0, "position": 2.7}}}, {"category": "تخمین قیمت", "keyword": "قیمت خودرو کارکرده", "metrics": {"W02 [01/08-01/14]": {"impressions": 54.0, "position": 2.4}, "W03 [01/15-01/21]": {"impressions": 89.0, "position": 2.5}, "W04 [01/22-01/28]": {"impressions": 4707.0, "position": 2.3}, "W05 [01/29-02/04]": {"impressions": 11003.0, "position": 1.9}, "W06 [02/05-02/11]": {"impressions": 22811.0, "position": 2.0}, "W07 [02/12-02/18]": {"impressions": 16086.0, "position": 2.1}, "W08 [02/19-02/25]": {"impressions": 11908.0, "position": 2.4}, "W09 [02/26-03/01]": {"impressions": 10542.0, "position": 3.2}, "W10 [03/02-03/08]": {"impressions": 9058.0, "position": 3.5}, "W11 [03/09-03/15]": {"impressions": 8271.0, "position": 4.1}, "W12 [03/16-03/22]": {"impressions": 7503.0, "position": 4.5}, "W13 [03/23-03/29]": {"impressions": 9819.0, "position": 4.6}, "W14 [03/30-04/05]": {"impressions": 6934.0, "position": 3.6}, "W15 [04/06-04/12]": {"impressions": 7415.0, "position": 3.3}, "W16 [04/13-04/19]": {"impressions": 6558.0, "position": 3.0}}}, {"category": "تخمین قیمت", "keyword": "قیمت روز خودرو کارکرده", "metrics": {"W02 [01/08-01/14]": {"impressions": 3.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 88.0, "position": 1.9}, "W05 [01/29-02/04]": {"impressions": 291.0, "position": 1.9}, "W06 [02/05-02/11]": {"impressions": 635.0, "position": 2.0}, "W07 [02/12-02/18]": {"impressions": 450.0, "position": 2.0}, "W08 [02/19-02/25]": {"impressions": 335.0, "position": 2.1}, "W09 [02/26-03/01]": {"impressions": 333.0, "position": 2.6}, "W10 [03/02-03/08]": {"impressions": 283.0, "position": 3.1}, "W11 [03/09-03/15]": {"impressions": 309.0, "position": 3.2}, "W12 [03/16-03/22]": {"impressions": 288.0, "position": 3.0}, "W13 [03/23-03/29]": {"impressions": 354.0, "position": 3.1}, "W14 [03/30-04/05]": {"impressions": 226.0, "position": 3.1}, "W15 [04/06-04/12]": {"impressions": 255.0, "position": 3.3}, "W16 [04/13-04/19]": {"impressions": 236.0, "position": 3.2}}}, {"category": "تخمین قیمت", "keyword": "تخمین قیمت خودرو کارکرده", "metrics": {"W02 [01/08-01/14]": {"impressions": 20.0, "position": 1.1}, "W03 [01/15-01/21]": {"impressions": 23.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 914.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 3002.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 5592.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 3812.0, "position": 1.5}, "W08 [02/19-02/25]": {"impressions": 3012.0, "position": 2.4}, "W09 [02/26-03/01]": {"impressions": 2781.0, "position": 2.5}, "W10 [03/02-03/08]": {"impressions": 2378.0, "position": 2.6}, "W11 [03/09-03/15]": {"impressions": 2857.0, "position": 2.6}, "W12 [03/16-03/22]": {"impressions": 3244.0, "position": 2.4}, "W13 [03/23-03/29]": {"impressions": 2738.0, "position": 2.6}, "W14 [03/30-04/05]": {"impressions": 2222.0, "position": 2.7}, "W15 [04/06-04/12]": {"impressions": 2863.0, "position": 2.7}, "W16 [04/13-04/19]": {"impressions": 2490.0, "position": 2.7}}}, {"category": "قیمت", "keyword": "قیمت محصولات ایران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 27.0, "position": 3.5}, "W03 [01/15-01/21]": {"impressions": 34.0, "position": 2.8}, "W04 [01/22-01/28]": {"impressions": 4427.0, "position": 3.5}, "W05 [01/29-02/04]": {"impressions": 2192.0, "position": 7.4}, "W06 [02/05-02/11]": {"impressions": 21975.0, "position": 4.8}, "W07 [02/12-02/18]": {"impressions": 25741.0, "position": 4.0}, "W08 [02/19-02/25]": {"impressions": 13290.0, "position": 3.0}, "W09 [02/26-03/01]": {"impressions": 14188.0, "position": 4.3}, "W10 [03/02-03/08]": {"impressions": 10053.0, "position": 7.2}, "W11 [03/09-03/15]": {"impressions": 5791.0, "position": 6.8}, "W12 [03/16-03/22]": {"impressions": 5039.0, "position": 6.9}, "W13 [03/23-03/29]": {"impressions": 2839.0, "position": 6.2}, "W14 [03/30-04/05]": {"impressions": 462.0, "position": 6.3}, "W15 [04/06-04/12]": {"impressions": 167.0, "position": 6.4}, "W16 [04/13-04/19]": {"impressions": 266.0, "position": 6.6}}}, {"category": "قیمت", "keyword": "قیمت محصولات ایران خودرو کارخانه و بازار", "metrics": {"W02 [01/08-01/14]": {"impressions": 19.0, "position": 1.8}, "W03 [01/15-01/21]": {"impressions": 34.0, "position": 1.5}, "W04 [01/22-01/28]": {"impressions": 9472.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 9970.0, "position": 2.1}, "W06 [02/05-02/11]": {"impressions": 13851.0, "position": 3.4}, "W07 [02/12-02/18]": {"impressions": 20662.0, "position": 2.2}, "W08 [02/19-02/25]": {"impressions": 10827.0, "position": 1.0}, "W09 [02/26-03/01]": {"impressions": 7297.0, "position": 1.0}, "W10 [03/02-03/08]": {"impressions": 6968.0, "position": 1.0}, "W11 [03/09-03/15]": {"impressions": 6744.0, "position": 3.0}, "W12 [03/16-03/22]": {"impressions": 5323.0, "position": 4.3}, "W13 [03/23-03/29]": {"impressions": 1644.0, "position": 6.1}, "W14 [03/30-04/05]": {"impressions": 1033.0, "position": 7.4}, "W15 [04/06-04/12]": {"impressions": 171.0, "position": 7.1}, "W16 [04/13-04/19]": {"impressions": 242.0, "position": 6.1}}}, {"category": "قیمت", "keyword": "قیمت بازار محصولات ایران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 8.0, "position": 3.1}, "W04 [01/22-01/28]": {"impressions": 246.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 736.0, "position": 2.3}, "W06 [02/05-02/11]": {"impressions": 1425.0, "position": 3.2}, "W07 [02/12-02/18]": {"impressions": 2434.0, "position": 1.6}, "W08 [02/19-02/25]": {"impressions": 1653.0, "position": 2.8}, "W09 [02/26-03/01]": {"impressions": 1388.0, "position": 2.2}, "W10 [03/02-03/08]": {"impressions": 1266.0, "position": 2.4}, "W11 [03/09-03/15]": {"impressions": 1349.0, "position": 2.9}, "W12 [03/16-03/22]": {"impressions": 927.0, "position": 2.5}, "W13 [03/23-03/29]": {"impressions": 3329.0, "position": 3.2}, "W14 [03/30-04/05]": {"impressions": 4249.0, "position": 4.5}, "W15 [04/06-04/12]": {"impressions": 1289.0, "position": 3.4}, "W16 [04/13-04/19]": {"impressions": 947.0, "position": 2.8}}}, {"category": "قیمت", "keyword": "قیمت روز محصولات ایران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 2.0, "position": 3.0}, "W03 [01/15-01/21]": {"impressions": 5.0, "position": 2.2}, "W04 [01/22-01/28]": {"impressions": 418.0, "position": 2.5}, "W05 [01/29-02/04]": {"impressions": 1485.0, "position": 3.5}, "W06 [02/05-02/11]": {"impressions": 3827.0, "position": 3.6}, "W07 [02/12-02/18]": {"impressions": 3088.0, "position": 2.4}, "W08 [02/19-02/25]": {"impressions": 1565.0, "position": 2.4}, "W09 [02/26-03/01]": {"impressions": 1641.0, "position": 3.0}, "W10 [03/02-03/08]": {"impressions": 1648.0, "position": 3.0}, "W11 [03/09-03/15]": {"impressions": 1969.0, "position": 3.0}, "W12 [03/16-03/22]": {"impressions": 1679.0, "position": 3.0}, "W13 [03/23-03/29]": {"impressions": 4071.0, "position": 3.2}, "W14 [03/30-04/05]": {"impressions": 2609.0, "position": 3.4}, "W15 [04/06-04/12]": {"impressions": 2195.0, "position": 3.8}, "W16 [04/13-04/19]": {"impressions": 1488.0, "position": 3.2}}}, {"category": "قیمت", "keyword": "قیمت جدید محصولات ایران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 2.0, "position": 3.5}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 112.0, "position": 5.2}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 528.0, "position": 5.3}, "W07 [02/12-02/18]": {"impressions": 980.0, "position": 5.0}, "W08 [02/19-02/25]": {"impressions": 129.0, "position": 6.0}, "W09 [02/26-03/01]": {"impressions": 543.0, "position": 3.8}, "W10 [03/02-03/08]": {"impressions": 10.0, "position": 8.3}, "W11 [03/09-03/15]": {"impressions": 32.0, "position": 7.3}, "W12 [03/16-03/22]": {"impressions": 34.0, "position": 9.0}, "W13 [03/23-03/29]": {"impressions": 51.0, "position": 7.8}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 0.0, "position": 0.0}, "W16 [04/13-04/19]": {"impressions": 3.0, "position": 5.0}}}, {"category": "قیمت", "keyword": "قیمت محصولات سایپا", "metrics": {"W02 [01/08-01/14]": {"impressions": 4.0, "position": 3.8}, "W03 [01/15-01/21]": {"impressions": 16.0, "position": 3.0}, "W04 [01/22-01/28]": {"impressions": 3657.0, "position": 1.9}, "W05 [01/29-02/04]": {"impressions": 8240.0, "position": 4.7}, "W06 [02/05-02/11]": {"impressions": 15212.0, "position": 5.4}, "W07 [02/12-02/18]": {"impressions": 22305.0, "position": 3.1}, "W08 [02/19-02/25]": {"impressions": 11695.0, "position": 3.0}, "W09 [02/26-03/01]": {"impressions": 9692.0, "position": 3.0}, "W10 [03/02-03/08]": {"impressions": 8031.0, "position": 3.0}, "W11 [03/09-03/15]": {"impressions": 6550.0, "position": 2.0}, "W12 [03/16-03/22]": {"impressions": 5059.0, "position": 2.0}, "W13 [03/23-03/29]": {"impressions": 9703.0, "position": 2.3}, "W14 [03/30-04/05]": {"impressions": 7455.0, "position": 2.4}, "W15 [04/06-04/12]": {"impressions": 6247.0, "position": 2.8}, "W16 [04/13-04/19]": {"impressions": 5806.0, "position": 2.4}}}, {"category": "قیمت", "keyword": "قیمت محصولات سایپا کارخانه و بازار", "metrics": {"W02 [01/08-01/14]": {"impressions": 2.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 13.0, "position": 3.1}, "W04 [01/22-01/28]": {"impressions": 3592.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 6458.0, "position": 1.3}, "W06 [02/05-02/11]": {"impressions": 6087.0, "position": 2.0}, "W07 [02/12-02/18]": {"impressions": 6557.0, "position": 2.0}, "W08 [02/19-02/25]": {"impressions": 5111.0, "position": 2.0}, "W09 [02/26-03/01]": {"impressions": 3117.0, "position": 1.7}, "W10 [03/02-03/08]": {"impressions": 3253.0, "position": 1.4}, "W11 [03/09-03/15]": {"impressions": 2768.0, "position": 1.2}, "W12 [03/16-03/22]": {"impressions": 2493.0, "position": 1.2}, "W13 [03/23-03/29]": {"impressions": 5095.0, "position": 1.2}, "W14 [03/30-04/05]": {"impressions": 3215.0, "position": 1.2}, "W15 [04/06-04/12]": {"impressions": 3322.0, "position": 1.2}, "W16 [04/13-04/19]": {"impressions": 2756.0, "position": 1.2}}}, {"category": "قیمت", "keyword": "قیمت روز محصولات سایپا", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 210.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 749.0, "position": 1.4}, "W06 [02/05-02/11]": {"impressions": 1954.0, "position": 3.6}, "W07 [02/12-02/18]": {"impressions": 1589.0, "position": 1.8}, "W08 [02/19-02/25]": {"impressions": 1015.0, "position": 1.8}, "W09 [02/26-03/01]": {"impressions": 863.0, "position": 2.0}, "W10 [03/02-03/08]": {"impressions": 830.0, "position": 1.0}, "W11 [03/09-03/15]": {"impressions": 739.0, "position": 1.0}, "W12 [03/16-03/22]": {"impressions": 637.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 1159.0, "position": 1.3}, "W14 [03/30-04/05]": {"impressions": 724.0, "position": 1.3}, "W15 [04/06-04/12]": {"impressions": 787.0, "position": 1.5}, "W16 [04/13-04/19]": {"impressions": 613.0, "position": 1.5}}}, {"category": "قیمت", "keyword": "قیمت بازار محصولات سایپا", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 3.7}, "W04 [01/22-01/28]": {"impressions": 263.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 643.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 1259.0, "position": 1.5}, "W07 [02/12-02/18]": {"impressions": 1038.0, "position": 1.6}, "W08 [02/19-02/25]": {"impressions": 799.0, "position": 1.9}, "W09 [02/26-03/01]": {"impressions": 481.0, "position": 1.9}, "W10 [03/02-03/08]": {"impressions": 578.0, "position": 1.3}, "W11 [03/09-03/15]": {"impressions": 461.0, "position": 1.1}, "W12 [03/16-03/22]": {"impressions": 348.0, "position": 1.1}, "W13 [03/23-03/29]": {"impressions": 577.0, "position": 1.1}, "W14 [03/30-04/05]": {"impressions": 464.0, "position": 1.2}, "W15 [04/06-04/12]": {"impressions": 519.0, "position": 1.4}, "W16 [04/13-04/19]": {"impressions": 347.0, "position": 1.4}}}, {"category": "قیمت", "keyword": "قیمت جدید محصولات سایپا", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 2.0, "position": 18.0}, "W04 [01/22-01/28]": {"impressions": 187.0, "position": 2.1}, "W05 [01/29-02/04]": {"impressions": 324.0, "position": 7.1}, "W06 [02/05-02/11]": {"impressions": 264.0, "position": 8.4}, "W07 [02/12-02/18]": {"impressions": 466.0, "position": 7.1}, "W08 [02/19-02/25]": {"impressions": 409.0, "position": 4.9}, "W09 [02/26-03/01]": {"impressions": 252.0, "position": 7.3}, "W10 [03/02-03/08]": {"impressions": 265.0, "position": 6.4}, "W11 [03/09-03/15]": {"impressions": 301.0, "position": 5.6}, "W12 [03/16-03/22]": {"impressions": 268.0, "position": 5.3}, "W13 [03/23-03/29]": {"impressions": 1013.0, "position": 6.7}, "W14 [03/30-04/05]": {"impressions": 1047.0, "position": 6.8}, "W15 [04/06-04/12]": {"impressions": 550.0, "position": 6.6}, "W16 [04/13-04/19]": {"impressions": 877.0, "position": 6.5}}}, {"category": "قیمت", "keyword": "قیمت محصولات مدیران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 6.0, "position": 1.5}, "W04 [01/22-01/28]": {"impressions": 527.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 1420.0, "position": 1.8}, "W06 [02/05-02/11]": {"impressions": 2004.0, "position": 2.2}, "W07 [02/12-02/18]": {"impressions": 1946.0, "position": 3.5}, "W08 [02/19-02/25]": {"impressions": 2019.0, "position": 2.1}, "W09 [02/26-03/01]": {"impressions": 1550.0, "position": 1.9}, "W10 [03/02-03/08]": {"impressions": 1276.0, "position": 1.7}, "W11 [03/09-03/15]": {"impressions": 2802.0, "position": 3.3}, "W12 [03/16-03/22]": {"impressions": 1256.0, "position": 1.6}, "W13 [03/23-03/29]": {"impressions": 1135.0, "position": 1.6}, "W14 [03/30-04/05]": {"impressions": 824.0, "position": 1.6}, "W15 [04/06-04/12]": {"impressions": 843.0, "position": 1.7}, "W16 [04/13-04/19]": {"impressions": 703.0, "position": 1.7}}}, {"category": "قیمت", "keyword": "قیمت روز محصولات مدیران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 1.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 82.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 201.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 358.0, "position": 1.3}, "W07 [02/12-02/18]": {"impressions": 353.0, "position": 2.0}, "W08 [02/19-02/25]": {"impressions": 291.0, "position": 1.9}, "W09 [02/26-03/01]": {"impressions": 244.0, "position": 1.8}, "W10 [03/02-03/08]": {"impressions": 233.0, "position": 1.3}, "W11 [03/09-03/15]": {"impressions": 376.0, "position": 1.3}, "W12 [03/16-03/22]": {"impressions": 204.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 227.0, "position": 1.3}, "W14 [03/30-04/05]": {"impressions": 139.0, "position": 1.2}, "W15 [04/06-04/12]": {"impressions": 174.0, "position": 1.2}, "W16 [04/13-04/19]": {"impressions": 142.0, "position": 1.4}}}, {"category": "قیمت", "keyword": "قیمت بازار محصولات مدیران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 1.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 11.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 21.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 66.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 53.0, "position": 1.8}, "W08 [02/19-02/25]": {"impressions": 25.0, "position": 1.8}, "W09 [02/26-03/01]": {"impressions": 12.0, "position": 1.8}, "W10 [03/02-03/08]": {"impressions": 13.0, "position": 1.3}, "W11 [03/09-03/15]": {"impressions": 62.0, "position": 1.3}, "W12 [03/16-03/22]": {"impressions": 18.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 30.0, "position": 1.4}, "W14 [03/30-04/05]": {"impressions": 24.0, "position": 1.4}, "W15 [04/06-04/12]": {"impressions": 22.0, "position": 1.3}, "W16 [04/13-04/19]": {"impressions": 5.0, "position": 1.2}}}, {"category": "قیمت", "keyword": "قیمت روز مدیران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 1.0, "position": 2.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 35.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 160.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 298.0, "position": 1.6}, "W07 [02/12-02/18]": {"impressions": 308.0, "position": 3.0}, "W08 [02/19-02/25]": {"impressions": 211.0, "position": 1.9}, "W09 [02/26-03/01]": {"impressions": 164.0, "position": 1.9}, "W10 [03/02-03/08]": {"impressions": 135.0, "position": 1.4}, "W11 [03/09-03/15]": {"impressions": 305.0, "position": 1.3}, "W12 [03/16-03/22]": {"impressions": 150.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 180.0, "position": 1.4}, "W14 [03/30-04/05]": {"impressions": 107.0, "position": 1.6}, "W15 [04/06-04/12]": {"impressions": 111.0, "position": 1.5}, "W16 [04/13-04/19]": {"impressions": 83.0, "position": 1.4}}}, {"category": "قیمت", "keyword": "قیمت جدید محصولات مدیران خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": 1.0, "position": 1.0}, "W03 [01/15-01/21]": {"impressions": 2.0, "position": 3.0}, "W04 [01/22-01/28]": {"impressions": 107.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 222.0, "position": 1.9}, "W06 [02/05-02/11]": {"impressions": 254.0, "position": 1.6}, "W07 [02/12-02/18]": {"impressions": 105.0, "position": 3.3}, "W08 [02/19-02/25]": {"impressions": 309.0, "position": 2.1}, "W09 [02/26-03/01]": {"impressions": 227.0, "position": 1.9}, "W10 [03/02-03/08]": {"impressions": 209.0, "position": 1.6}, "W11 [03/09-03/15]": {"impressions": 1974.0, "position": 3.4}, "W12 [03/16-03/22]": {"impressions": 329.0, "position": 1.5}, "W13 [03/23-03/29]": {"impressions": 236.0, "position": 1.7}, "W14 [03/30-04/05]": {"impressions": 147.0, "position": 1.5}, "W15 [04/06-04/12]": {"impressions": 97.0, "position": 2.1}, "W16 [04/13-04/19]": {"impressions": 131.0, "position": 1.5}}}, {"category": "قیمت", "keyword": "قیمت محصولات کرمان موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 1427.0, "position": 6.3}, "W05 [01/29-02/04]": {"impressions": 298.0, "position": 4.9}, "W06 [02/05-02/11]": {"impressions": 60.0, "position": 9.7}, "W07 [02/12-02/18]": {"impressions": 580.0, "position": 7.8}, "W08 [02/19-02/25]": {"impressions": 110.0, "position": 6.3}, "W09 [02/26-03/01]": {"impressions": 31.0, "position": 7.0}, "W10 [03/02-03/08]": {"impressions": 58.0, "position": 8.0}, "W11 [03/09-03/15]": {"impressions": 337.0, "position": 8.0}, "W12 [03/16-03/22]": {"impressions": 386.0, "position": 8.6}, "W13 [03/23-03/29]": {"impressions": 559.0, "position": 7.7}, "W14 [03/30-04/05]": {"impressions": 46.0, "position": 6.8}, "W15 [04/06-04/12]": {"impressions": 117.0, "position": 7.5}, "W16 [04/13-04/19]": {"impressions": 8.0, "position": 6.4}}}, {"category": "قیمت", "keyword": "قیمت جدید محصولات کرمان موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 26.0, "position": 4.4}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 4.0, "position": 6.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 3.0, "position": 6.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 2.0, "position": 6.0}, "W11 [03/09-03/15]": {"impressions": 34.0, "position": 9.0}, "W12 [03/16-03/22]": {"impressions": 32.0, "position": 8.1}, "W13 [03/23-03/29]": {"impressions": 89.0, "position": 8.3}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 21.0, "position": 7.0}, "W16 [04/13-04/19]": {"impressions": 3.0, "position": 8.0}}}, {"category": "قیمت", "keyword": "قیمت روز محصولات کرمان موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 25.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 97.0, "position": 2.4}, "W06 [02/05-02/11]": {"impressions": 182.0, "position": 2.8}, "W07 [02/12-02/18]": {"impressions": 221.0, "position": 3.0}, "W08 [02/19-02/25]": {"impressions": 126.0, "position": 2.0}, "W09 [02/26-03/01]": {"impressions": 108.0, "position": 2.1}, "W10 [03/02-03/08]": {"impressions": 105.0, "position": 2.0}, "W11 [03/09-03/15]": {"impressions": 77.0, "position": 1.9}, "W12 [03/16-03/22]": {"impressions": 66.0, "position": 1.8}, "W13 [03/23-03/29]": {"impressions": 135.0, "position": 1.9}, "W14 [03/30-04/05]": {"impressions": 71.0, "position": 1.8}, "W15 [04/06-04/12]": {"impressions": 64.0, "position": 1.7}, "W16 [04/13-04/19]": {"impressions": 74.0, "position": 1.8}}}, {"category": "قیمت", "keyword": "قیمت کارخانه کرمان موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 52.0, "position": 8.0}, "W05 [01/29-02/04]": {"impressions": 10.0, "position": 8.7}, "W06 [02/05-02/11]": {"impressions": 3.0, "position": 7.3}, "W07 [02/12-02/18]": {"impressions": 4.0, "position": 9.5}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 54.0, "position": 8.1}, "W10 [03/02-03/08]": {"impressions": 24.0, "position": 7.5}, "W11 [03/09-03/15]": {"impressions": 100.0, "position": 7.6}, "W12 [03/16-03/22]": {"impressions": 68.0, "position": 8.1}, "W13 [03/23-03/29]": {"impressions": 69.0, "position": 8.4}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 15.0, "position": 9.0}, "W16 [04/13-04/19]": {"impressions": 0.0, "position": 0.0}}}, {"category": "قیمت", "keyword": "قیمت محصولات بهمن موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 11.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 1346.0, "position": 1.1}, "W05 [01/29-02/04]": {"impressions": 3173.0, "position": 1.6}, "W06 [02/05-02/11]": {"impressions": 1853.0, "position": 3.2}, "W07 [02/12-02/18]": {"impressions": 1926.0, "position": 5.5}, "W08 [02/19-02/25]": {"impressions": 8296.0, "position": 6.0}, "W09 [02/26-03/01]": {"impressions": 1966.0, "position": 3.8}, "W10 [03/02-03/08]": {"impressions": 3007.0, "position": 2.1}, "W11 [03/09-03/15]": {"impressions": 1041.0, "position": 1.9}, "W12 [03/16-03/22]": {"impressions": 2025.0, "position": 1.6}, "W13 [03/23-03/29]": {"impressions": 958.0, "position": 1.4}, "W14 [03/30-04/05]": {"impressions": 737.0, "position": 1.4}, "W15 [04/06-04/12]": {"impressions": 665.0, "position": 1.5}, "W16 [04/13-04/19]": {"impressions": 560.0, "position": 1.6}}}, {"category": "قیمت", "keyword": "قیمت محصولات بهمن موتور در کارخانه و بازار", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 6.0, "position": 2.0}, "W04 [01/22-01/28]": {"impressions": 276.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 853.0, "position": 1.5}, "W06 [02/05-02/11]": {"impressions": 598.0, "position": 2.6}, "W07 [02/12-02/18]": {"impressions": 539.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 736.0, "position": 2.8}, "W09 [02/26-03/01]": {"impressions": 348.0, "position": 2.7}, "W10 [03/02-03/08]": {"impressions": 712.0, "position": 1.5}, "W11 [03/09-03/15]": {"impressions": 416.0, "position": 1.3}, "W12 [03/16-03/22]": {"impressions": 837.0, "position": 1.2}, "W13 [03/23-03/29]": {"impressions": 389.0, "position": 1.2}, "W14 [03/30-04/05]": {"impressions": 315.0, "position": 1.2}, "W15 [04/06-04/12]": {"impressions": 299.0, "position": 1.2}, "W16 [04/13-04/19]": {"impressions": 185.0, "position": 1.2}}}, {"category": "قیمت", "keyword": "قیمت روز محصولات بهمن موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 4.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 15.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 17.0, "position": 2.0}, "W07 [02/12-02/18]": {"impressions": 82.0, "position": 3.0}, "W08 [02/19-02/25]": {"impressions": 49.0, "position": 4.0}, "W09 [02/26-03/01]": {"impressions": 48.0, "position": 4.0}, "W10 [03/02-03/08]": {"impressions": 60.0, "position": 2.0}, "W11 [03/09-03/15]": {"impressions": 38.0, "position": 2.0}, "W12 [03/16-03/22]": {"impressions": 115.0, "position": 1.3}, "W13 [03/23-03/29]": {"impressions": 42.0, "position": 1.6}, "W14 [03/30-04/05]": {"impressions": 18.0, "position": 1.4}, "W15 [04/06-04/12]": {"impressions": 25.0, "position": 1.5}, "W16 [04/13-04/19]": {"impressions": 31.0, "position": 1.6}}}, {"category": "قیمت", "keyword": "قیمت خودروهای بهمن موتور", "metrics": {"W02 [01/08-01/14]": {"impressions": 0.0, "position": 0.0}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 14.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 21.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 36.0, "position": 2.1}, "W07 [02/12-02/18]": {"impressions": 57.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 49.0, "position": 4.7}, "W09 [02/26-03/01]": {"impressions": 34.0, "position": 3.0}, "W10 [03/02-03/08]": {"impressions": 88.0, "position": 2.0}, "W11 [03/09-03/15]": {"impressions": 40.0, "position": 2.0}, "W12 [03/16-03/22]": {"impressions": 88.0, "position": 1.7}, "W13 [03/23-03/29]": {"impressions": 28.0, "position": 1.4}, "W14 [03/30-04/05]": {"impressions": 37.0, "position": 1.7}, "W15 [04/06-04/12]": {"impressions": 29.0, "position": 1.7}, "W16 [04/13-04/19]": {"impressions": 26.0, "position": 1.8}}}]}, {"key": "buy", "title": "خرید", "rows": [{"category": "خرید", "keyword": "خرید خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 17.0, "position": 16.3}, "W04 [01/22-01/28]": {"impressions": 511.0, "position": 11.6}, "W05 [01/29-02/04]": {"impressions": 1044.0, "position": 10.5}, "W06 [02/05-02/11]": {"impressions": 365.0, "position": 12.0}, "W07 [02/06-02/12]": {"impressions": 782.0, "position": 11.4}, "W08 [02/19-02/25]": {"impressions": 84.0, "position": 11.1}, "W09 [02/26-03/01]": {"impressions": 119.0, "position": 12.2}, "W10 [03/02-03/08]": {"impressions": 255.0, "position": 11.5}, "W11 [03/09-03/15]": {"impressions": 120.0, "position": 11.7}, "W12 [03/16-03/22]": {"impressions": 269.0, "position": 12.1}, "W13 [03/23-03/29]": {"impressions": 87.0, "position": 11.4}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 1.0, "position": 6.0}, "W16 [04/13-04/19]": {"impressions": 10.0, "position": 12.0}}}, {"category": "خرید", "keyword": "خرید ماشین دست دوم", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 3.0, "position": 1.3}, "W04 [01/22-01/28]": {"impressions": 19.0, "position": 6.8}, "W05 [01/29-02/04]": {"impressions": 103.0, "position": 5.7}, "W06 [02/05-02/11]": {"impressions": 93.0, "position": 5.2}, "W07 [02/06-02/12]": {"impressions": 71.0, "position": 5.5}, "W08 [02/19-02/25]": {"impressions": 47.0, "position": 6.4}, "W09 [02/26-03/01]": {"impressions": 11.0, "position": 6.4}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 0.0, "position": 0.0}, "W12 [03/16-03/22]": {"impressions": 20.0, "position": 9.9}, "W13 [03/23-03/29]": {"impressions": 0.0, "position": 0.0}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 0.0, "position": 0.0}, "W16 [04/13-04/19]": {"impressions": 0.0, "position": 0.0}}}, {"category": "خرید", "keyword": "خرید و فروش خودرو", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 14.0, "position": 5.9}, "W04 [01/22-01/28]": {"impressions": 313.0, "position": 2.9}, "W05 [01/29-02/04]": {"impressions": 747.0, "position": 3.4}, "W06 [02/05-02/11]": {"impressions": 1038.0, "position": 4.8}, "W07 [02/06-02/12]": {"impressions": 994.0, "position": 4.9}, "W08 [02/19-02/25]": {"impressions": 1020.0, "position": 5.5}, "W09 [02/26-03/01]": {"impressions": 942.0, "position": 5.4}, "W10 [03/02-03/08]": {"impressions": 862.0, "position": 5.1}, "W11 [03/09-03/15]": {"impressions": 759.0, "position": 6.0}, "W12 [03/16-03/22]": {"impressions": 707.0, "position": 5.6}, "W13 [03/23-03/29]": {"impressions": 714.0, "position": 5.7}, "W14 [03/30-04/05]": {"impressions": 502.0, "position": 6.6}, "W15 [04/06-04/12]": {"impressions": 665.0, "position": 5.5}, "W16 [04/13-04/19]": {"impressions": 612.0, "position": 5.8}}}]}, {"key": "city", "title": "شهر", "rows": [{"category": "شهر", "keyword": "فروش خودرو در شیراز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 0.0, "position": 0.0}, "W12 [03/16-03/22]": {"impressions": 0.0, "position": 0.0}, "W13 [03/23-03/29]": {"impressions": 1.0, "position": 5.0}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 3.0, "position": 3.7}, "W16 [04/13-04/19]": {"impressions": 0.0, "position": 0.0}}}, {"category": "شهر", "keyword": "خودرو ۴۵ شیراز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 2.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 37.0, "position": 1.2}, "W05 [01/29-02/04]": {"impressions": 124.0, "position": 1.1}, "W06 [02/05-02/11]": {"impressions": 175.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 135.0, "position": 1.1}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 147.0, "position": 1.3}, "W10 [03/02-03/08]": {"impressions": 210.0, "position": 1.4}, "W11 [03/09-03/15]": {"impressions": 278.0, "position": 1.4}, "W12 [03/16-03/22]": {"impressions": 291.0, "position": 1.2}, "W13 [03/23-03/29]": {"impressions": 258.0, "position": 1.2}, "W14 [03/30-04/05]": {"impressions": 178.0, "position": 1.1}, "W15 [04/06-04/12]": {"impressions": 229.0, "position": 1.2}, "W16 [04/13-04/19]": {"impressions": 292.0, "position": 1.2}}}, {"category": "شهر", "keyword": "خودرو 45 شیراز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 1.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 8.0, "position": 1.3}, "W05 [01/29-02/04]": {"impressions": 50.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 56.0, "position": 1.1}, "W07 [02/12-02/18]": {"impressions": 53.0, "position": 1.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 59.0, "position": 1.6}, "W10 [03/02-03/08]": {"impressions": 85.0, "position": 1.3}, "W11 [03/09-03/15]": {"impressions": 173.0, "position": 1.5}, "W12 [03/16-03/22]": {"impressions": 122.0, "position": 1.6}, "W13 [03/23-03/29]": {"impressions": 144.0, "position": 1.1}, "W14 [03/30-04/05]": {"impressions": 144.0, "position": 1.3}, "W15 [04/06-04/12]": {"impressions": 169.0, "position": 1.3}, "W16 [04/13-04/19]": {"impressions": 187.0, "position": 1.1}}}, {"category": "شهر", "keyword": "فروش خودرو شیراز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 1.0, "position": 6.0}, "W11 [03/09-03/15]": {"impressions": 5.0, "position": 2.6}, "W12 [03/16-03/22]": {"impressions": 1.0, "position": 5.0}, "W13 [03/23-03/29]": {"impressions": 0.0, "position": 0.0}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 3.0, "position": 2.7}, "W16 [04/13-04/19]": {"impressions": 3.0, "position": 4.0}}}, {"category": "شهر", "keyword": "سایت خودرو ۴۵ شیراز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 0.0, "position": 0.0}, "W12 [03/16-03/22]": {"impressions": 8.0, "position": 1.1}, "W13 [03/23-03/29]": {"impressions": 2.0, "position": 1.0}, "W14 [03/30-04/05]": {"impressions": 5.0, "position": 1.2}, "W15 [04/06-04/12]": {"impressions": 3.0, "position": 1.0}, "W16 [04/13-04/19]": {"impressions": 2.0, "position": 1.0}}}, {"category": "شهر", "keyword": "فروش خودرو در اصفهان", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 0.0, "position": 0.0}, "W12 [03/16-03/22]": {"impressions": 0.0, "position": 0.0}, "W13 [03/23-03/29]": {"impressions": 0.0, "position": 0.0}, "W14 [03/30-04/05]": {"impressions": 0.0, "position": 0.0}, "W15 [04/06-04/12]": {"impressions": 12.0, "position": 3.8}, "W16 [04/13-04/19]": {"impressions": 3.0, "position": 5.7}}}, {"category": "شهر", "keyword": "خودرو ۴۵ اصفهان", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 2.0, "position": 1.0}, "W04 [01/22-01/28]": {"impressions": 29.0, "position": 1.0}, "W05 [01/29-02/04]": {"impressions": 86.0, "position": 1.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 91.0, "position": 1.2}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 330.0, "position": 1.5}, "W12 [03/16-03/22]": {"impressions": 0.0, "position": 0.0}, "W13 [03/23-03/29]": {"impressions": 310.0, "position": 1.2}, "W14 [03/30-04/05]": {"impressions": 167.0, "position": 1.3}, "W15 [04/06-04/12]": {"impressions": 245.0, "position": 1.2}, "W16 [04/13-04/19]": {"impressions": 247.0, "position": 1.2}}}, {"category": "شهر", "keyword": "سایت خودرو ۴۵ اصفهان", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 0.0, "position": 0.0}, "W08 [02/19-02/25]": {"impressions": 0.0, "position": 0.0}, "W09 [02/26-03/01]": {"impressions": 0.0, "position": 0.0}, "W10 [03/02-03/08]": {"impressions": 0.0, "position": 0.0}, "W11 [03/09-03/15]": {"impressions": 0.0, "position": 0.0}, "W12 [03/16-03/22]": {"impressions": 0.0, "position": 0.0}, "W13 [03/23-03/29]": {"impressions": 24.0, "position": 1.1}, "W14 [03/30-04/05]": {"impressions": 5.0, "position": 1.0}, "W15 [04/06-04/12]": {"impressions": 7.0, "position": 1.0}, "W16 [04/13-04/19]": {"impressions": 6.0, "position": 1.0}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در تهران", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 0.0, "position": 0.0}, "W06 [02/05-02/11]": {"impressions": 0.0, "position": 0.0}, "W07 [02/12-02/18]": {"impressions": 1923.0, "position": 3.0}, "W08 [02/19-02/25]": {"impressions": 6041.0, "position": 5.0}, "W09 [02/26-03/01]": {"impressions": 8685.0, "position": 7.0}, "W10 [03/02-03/08]": {"impressions": 17775.0, "position": 7.2}, "W11 [03/09-03/15]": {"impressions": 12810.0, "position": 7.0}, "W12 [03/16-03/22]": {"impressions": 13080.0, "position": 6.4}, "W13 [03/23-03/29]": {"impressions": 220.0, "position": 6.2}, "W14 [03/30-04/05]": {"impressions": 18511.0, "position": 5.2}, "W15 [04/06-04/12]": {"impressions": 15378.0, "position": 3.8}, "W16 [04/13-04/19]": {"impressions": 20268.0, "position": 3.5}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در کرج", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 22.0, "position": 3.6}, "W04 [01/22-01/28]": {"impressions": 681.0, "position": 3.3}, "W05 [01/29-02/04]": {"impressions": 2859.0, "position": 3.9}, "W06 [02/05-02/11]": {"impressions": 6311.0, "position": 2.7}, "W07 [02/12-02/18]": {"impressions": 4607.0, "position": 2.9}, "W08 [02/19-02/25]": {"impressions": 4288.0, "position": 2.4}, "W09 [02/26-03/01]": {"impressions": 3069.0, "position": 2.7}, "W10 [03/02-03/08]": {"impressions": 3720.0, "position": 2.5}, "W11 [03/09-03/15]": {"impressions": 3816.0, "position": 2.5}, "W12 [03/16-03/22]": {"impressions": 3370.0, "position": 2.8}, "W13 [03/23-03/29]": {"impressions": 341.0, "position": 2.8}, "W14 [03/30-04/05]": {"impressions": 2578.0, "position": 2.8}, "W15 [04/06-04/12]": {"impressions": 3236.0, "position": 2.6}, "W16 [04/13-04/19]": {"impressions": 2898.0, "position": 2.6}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در مشهد", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 25.0, "position": 3.7}, "W04 [01/22-01/28]": {"impressions": 1475.0, "position": 2.1}, "W05 [01/29-02/04]": {"impressions": 5713.0, "position": 2.0}, "W06 [02/05-02/11]": {"impressions": 8710.0, "position": 1.7}, "W07 [02/12-02/18]": {"impressions": 6305.0, "position": 1.7}, "W08 [02/19-02/25]": {"impressions": 5226.0, "position": 1.6}, "W09 [02/26-03/01]": {"impressions": 4332.0, "position": 1.6}, "W10 [03/02-03/08]": {"impressions": 5910.0, "position": 1.7}, "W11 [03/09-03/15]": {"impressions": 6404.0, "position": 1.7}, "W12 [03/16-03/22]": {"impressions": 5556.0, "position": 1.8}, "W13 [03/23-03/29]": {"impressions": 737.0, "position": 1.6}, "W14 [03/30-04/05]": {"impressions": 5499.0, "position": 1.6}, "W15 [04/06-04/12]": {"impressions": 6650.0, "position": 1.6}, "W16 [04/13-04/19]": {"impressions": 5664.0, "position": 1.7}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در تبریز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 1753.0, "position": 2.4}, "W06 [02/05-02/11]": {"impressions": 4154.0, "position": 1.9}, "W07 [02/12-02/18]": {"impressions": 3505.0, "position": 2.2}, "W08 [02/19-02/25]": {"impressions": 3220.0, "position": 2.0}, "W09 [02/26-03/01]": {"impressions": 2393.0, "position": 1.9}, "W10 [03/02-03/08]": {"impressions": 3255.0, "position": 1.7}, "W11 [03/09-03/15]": {"impressions": 3588.0, "position": 1.7}, "W12 [03/16-03/22]": {"impressions": 3419.0, "position": 2.0}, "W13 [03/23-03/29]": {"impressions": 350.0, "position": 2.0}, "W14 [03/30-04/05]": {"impressions": 2600.0, "position": 1.8}, "W15 [04/06-04/12]": {"impressions": 3478.0, "position": 1.6}, "W16 [04/13-04/19]": {"impressions": 3457.0, "position": 1.8}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در اهواز", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 15.0, "position": 7.0}, "W04 [01/22-01/28]": {"impressions": 804.0, "position": 2.0}, "W05 [01/29-02/04]": {"impressions": 2823.0, "position": 1.8}, "W06 [02/05-02/11]": {"impressions": 4515.0, "position": 1.7}, "W07 [02/12-02/18]": {"impressions": 3485.0, "position": 1.7}, "W08 [02/19-02/25]": {"impressions": 3157.0, "position": 1.6}, "W09 [02/26-03/01]": {"impressions": 2953.0, "position": 1.7}, "W10 [03/02-03/08]": {"impressions": 3612.0, "position": 1.6}, "W11 [03/09-03/15]": {"impressions": 3864.0, "position": 1.7}, "W12 [03/16-03/22]": {"impressions": 3846.0, "position": 1.8}, "W13 [03/23-03/29]": {"impressions": 323.0, "position": 1.7}, "W14 [03/30-04/05]": {"impressions": 3468.0, "position": 1.7}, "W15 [04/06-04/12]": {"impressions": 4708.0, "position": 1.6}, "W16 [04/13-04/19]": {"impressions": 4424.0, "position": 1.8}}}, {"category": "شهر", "keyword": "صفحه لندینگ فروش خودرو در رشت", "metrics": {"W02 [01/08-01/14]": {"impressions": null, "position": null}, "W03 [01/15-01/21]": {"impressions": 0.0, "position": 0.0}, "W04 [01/22-01/28]": {"impressions": 0.0, "position": 0.0}, "W05 [01/29-02/04]": {"impressions": 948.0, "position": 2.3}, "W06 [02/05-02/11]": {"impressions": 2258.0, "position": 2.1}, "W07 [02/12-02/18]": {"impressions": 1616.0, "position": 2.4}, "W08 [02/19-02/25]": {"impressions": 1377.0, "position": 2.4}, "W09 [02/26-03/01]": {"impressions": 1174.0, "position": 2.1}, "W10 [03/02-03/08]": {"impressions": 1347.0, "position": 1.9}, "W11 [03/09-03/15]": {"impressions": 1319.0, "position": 2.1}, "W12 [03/16-03/22]": {"impressions": 1374.0, "position": 2.3}, "W13 [03/23-03/29]": {"impressions": 224.0, "position": 1.8}, "W14 [03/30-04/05]": {"impressions": 1195.0, "position": 1.7}, "W15 [04/06-04/12]": {"impressions": 1427.0, "position": 2.1}, "W16 [04/13-04/19]": {"impressions": 1487.0, "position": 2.4}}}]}], "searchConsoleMetrics": ["click", "impression", "ctr", "rank"], "businessMetrics": ["Q request", "Q request - non blog", "Buy", "Buy - non blog", "Organic users", "Organic new users", "Sessions", "Engaged Sessions", "Click-branded", "Click-non branded", "Brand Click Share"]};
+
+const SC_CARD_DEFS = [{"key": "click", "title": "Clicks", "color": "#00d4ff", "format": "number"}, {"key": "impression", "title": "Impressions", "color": "#4f8cff", "format": "number"}, {"key": "ctr", "title": "CTR", "color": "#b86bff", "format": "percent"}, {"key": "rank", "title": "Avg. Position", "color": "#ffc247", "format": "position"}];
+
+let scTrendChart = null;
+let keywordPoChart = null;
+let activeKeywordTab = 'forosh';
+let selectedKeywordIndex = 0;
+let currentKeywordRows = [];
+
+function populateKeywordTrendFilters() {
+    const weeks = reportData.weekLabels || [];
+    const fromSelect = document.getElementById('kw-from-week');
+    const toSelect = document.getElementById('kw-to-week');
+    if (!fromSelect || !toSelect || !weeks.length) return;
+
+    const options = weeks.map(week => `<option value="${week}">${week}</option>`).join('');
+    fromSelect.innerHTML = options;
+    toSelect.innerHTML = options;
+
+    const defaultFromIndex = Math.max(0, weeks.length - 6);
+    fromSelect.value = weeks[defaultFromIndex];
+    toSelect.value = weeks[weeks.length - 1];
+}
+
+function getKeywordTrendWeeks() {
+    const weeks = reportData.weekLabels || [];
+    const fromWeek = document.getElementById('kw-from-week')?.value;
+    const toWeek = document.getElementById('kw-to-week')?.value;
+    const fromIndex = weeks.indexOf(fromWeek);
+    const toIndex = weeks.indexOf(toWeek);
+
+    if (fromIndex < 0 || toIndex < 0) {
+        return weeks.slice(Math.max(0, weeks.length - 6));
+    }
+
+    const start = Math.min(fromIndex, toIndex);
+    const end = Math.max(fromIndex, toIndex);
+    return weeks.slice(start, end + 1);
+}
+
+function selectKeywordForTrend(index) {
+    selectedKeywordIndex = index;
+    const trendSelect = document.getElementById('kw-trend-select');
+    if (trendSelect) trendSelect.value = String(index);
+    document.querySelectorAll('.kw-row').forEach((row, rowIndex) => {
+        row.classList.toggle('selected', rowIndex === index);
+    });
+    renderKeywordPoTrendChart();
+}
+
+function getWeekMetrics(metrics, weekLabel) {
+    if (!metrics) return {};
+    if (metrics[weekLabel]) return metrics[weekLabel];
+
+    const selectedCode = weekCode(weekLabel);
+    const matchedKey = Object.keys(metrics).find(key => weekCode(key) === selectedCode);
+    return matchedKey ? metrics[matchedKey] : {};
+}
+
+function openKeywordTab(groupKey) {
+    activeKeywordTab = groupKey;
+    selectedKeywordIndex = 0;
+    document.querySelectorAll('.keyword-tab-button').forEach(button => {
+        button.classList.toggle('active', button.dataset.kwTab === groupKey);
+    });
+    renderCategoryGroups();
+}
+
+function formatNumber(value, decimals = 0) {
+    const number = Number(value ?? 0);
+    if (!Number.isFinite(number)) return '-';
+    return number.toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+    });
+}
+
+function formatPercent(value) {
+    const number = Number(value ?? 0);
+    if (!Number.isFinite(number)) return '-';
+    return `${number.toFixed(1)}%`;
+}
+
+function getScWeek() {
+    return document.getElementById('sc-week-filter').value;
+}
+
+function getSelectedWeek() {
+    return document.getElementById('week-filter').value;
+}
+
+function getPreviousWeek(weekLabel) {
+    const index = reportData.weekLabels.indexOf(weekLabel);
+    return index > 0 ? reportData.weekLabels[index - 1] : null;
+}
+
+function getTrendWeeks() {
+    const selected = getScWeek();
+    const range = document.getElementById('sc-trend-range').value;
+    const endIndex = reportData.weekLabels.indexOf(selected);
+    if (endIndex < 0) return reportData.weekLabels;
+
+    if (range === 'all') return reportData.weekLabels.slice(0, endIndex + 1);
+    const count = range === '4' ? 4 : 8;
+    const startIndex = Math.max(0, endIndex - count + 1);
+    return reportData.weekLabels.slice(startIndex, endIndex + 1);
+}
+
+function metricValue(metricName, weekLabel) {
+    return reportData.kpiMetrics?.[metricName]?.[weekLabel]?.value ?? null;
+}
+
+function metricGrowth(metricName, weekLabel) {
+    return reportData.kpiMetrics?.[metricName]?.[weekLabel]?.growth_pct ?? null;
+}
+
+function deltaInfo(current, previous, invert = false) {
+    if (current === null || current === undefined) {
+        return { delta: null, deltaPct: null, cls: 'neutral', arrow: '–' };
+    }
+
+    const currentValue = Number(current);
+    const previousValue = previous === null || previous === undefined ? null : Number(previous);
+    const delta = previousValue === null ? null : currentValue - previousValue;
+    const deltaPct = previousValue ? (delta / previousValue) * 100 : null;
+    let cls = 'neutral';
+    if (delta !== null) {
+        const adjusted = invert ? -delta : delta;
+        if (adjusted > 0) cls = 'positive';
+        if (adjusted < 0) cls = 'negative';
+    }
+    const arrow = delta === null ? '–' : delta > 0 ? '▲' : delta < 0 ? '▼' : '–';
+    return { delta, deltaPct, cls, arrow };
+}
+
+function makeMiniBars(currentValue, previousValue, accentColor) {
+    const current = Math.abs(Number(currentValue ?? 0));
+    const previous = Math.abs(Number(previousValue ?? 0));
+    const maxValue = Math.max(current, previous, 1);
+    const currentWidth = Math.max((current / maxValue) * 100, 4);
+    const previousWidth = Math.max((previous / maxValue) * 100, 4);
+    return `
+        <div class="metric-visual">
+            <div class="mini-label">CW / PW</div>
+            <div class="bar-row"><span>CW</span><div class="mini-track"><div class="mini-fill" style="width:${currentWidth}%; background:linear-gradient(90deg, ${accentColor}, rgba(255,255,255,0.45));"></div></div></div>
+            <div class="bar-row"><span>PW</span><div class="mini-track"><div class="mini-fill previous" style="width:${previousWidth}%;"></div></div></div>
+        </div>
+    `;
+}
+
+function formatMetricValue(value, formatType) {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) return '-';
+    if (formatType === 'percent') return formatPercent(value);
+    if (formatType === 'position') return Number(value).toFixed(1);
+    return formatNumber(value);
+}
+
+function renderSearchConsoleCards() {
+    const selectedWeek = getScWeek();
+    const previousWeek = getPreviousWeek(selectedWeek);
+    const container = document.getElementById('sc-cards');
+
+    container.innerHTML = SC_CARD_DEFS.map(def => {
+        const current = metricValue(def.key, selectedWeek);
+        const previous = previousWeek ? metricValue(def.key, previousWeek) : null;
+        const invert = def.key === 'rank';
+        const change = deltaInfo(current, previous, invert);
+        const display = formatMetricValue(current, def.format);
+        const deltaText = change.deltaPct === null
+            ? '– vs previous week'
+            : `${change.arrow} ${formatPercent(change.deltaPct)} vs previous week`;
+        return `
+            <div class="metric-card" style="--accent-color:${def.color}">
+                <div class="metric-top-line"></div>
+                ${makeMiniBars(current ?? 0, previous ?? 0, def.color)}
+                <div class="metric-title">${def.title}</div>
+                <div class="metric-value">${display}</div>
+                <div class="metric-delta ${change.cls}">${deltaText}</div>
+            </div>
+        `;
+    }).join('');
+
+    document.getElementById('sc-compare-note').innerHTML =
+        `داده از بلوک Metrics شیت | هفته: <strong>${selectedWeek}</strong> در برابر <strong>${previousWeek || '-'}</strong>`;
+}
+
+function renderScTrendChart() {
+    const weeks = getTrendWeeks();
+    const ctx = document.getElementById('sc-trend-chart');
+    const datasets = [
+        { key: 'click', label: 'Clicks', color: '#00d4ff', axis: 'y' },
+        { key: 'impression', label: 'Impressions', color: '#4f8cff', axis: 'y1' },
+        { key: 'ctr', label: 'CTR', color: '#b86bff', axis: 'y' },
+        { key: 'rank', label: 'Avg Position', color: '#ffc247', axis: 'y' },
+    ].map(item => ({
+        label: item.label,
+        data: weeks.map(week => metricValue(item.key, week)),
+        borderColor: item.color,
+        backgroundColor: item.color + '22',
+        tension: 0.25,
+        yAxisID: item.axis,
+    }));
+
+    if (scTrendChart) scTrendChart.destroy();
+    scTrendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: weeks.map(week => weekCode(week)),
+            datasets,
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#ddd' } } },
+            scales: {
+                x: { ticks: { color: '#bbb' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                y: { position: 'left', ticks: { color: '#bbb' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                y1: { position: 'right', ticks: { color: '#bbb' }, grid: { drawOnChartArea: false } },
+            },
+        },
+    });
+}
+
+function weekCode(label) {
+    const match = String(label).match(/W\d+/i);
+    return match ? match[0].toUpperCase() : label;
+}
+
+function formatPosition(value) {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) return '-';
+    return Number(value).toFixed(1);
+}
+
+function renderKeywordPoTrendChart() {
+    const canvas = document.getElementById('keyword-po-chart');
+    if (!canvas) return;
+
+    const weeks = getKeywordTrendWeeks();
+    const rows = currentKeywordRows || [];
+
+    if (!rows.length || !weeks.length) {
+        if (keywordPoChart) {
+            keywordPoChart.destroy();
+            keywordPoChart = null;
+        }
+        return;
+    }
+
+    const safeIndex = Math.min(Math.max(0, selectedKeywordIndex), rows.length - 1);
+    selectedKeywordIndex = safeIndex;
+    const row = rows[safeIndex];
+    const labels = weeks.map(week => weekCode(week));
+    const data = weeks.map(week => {
+        const metrics = getWeekMetrics(row.metrics, week);
+        const position = metrics.position;
+        return position === null || position === undefined ? null : Number(position);
+    });
+
+    if (keywordPoChart) keywordPoChart.destroy();
+    keywordPoChart = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Position (Po)',
+                data,
+                borderColor: '#ff7a00',
+                backgroundColor: 'rgba(255,122,0,0.15)',
+                tension: 0.25,
+                fill: true,
+                spanGaps: true,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+            }],
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { labels: { color: '#ddd' } },
+                title: {
+                    display: true,
+                    text: `${row.keyword}${row.category ? ' — ' + row.category : ''}`,
+                    color: '#ff9a3d',
+                },
+            },
+            scales: {
+                x: { ticks: { color: '#bbb' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+                y: {
+                    reverse: true,
+                    ticks: { color: '#bbb' },
+                    grid: { color: 'rgba(255,255,255,0.06)' },
+                    title: { display: true, text: 'Position (lower is better)', color: '#aaa' },
+                },
+            },
+        },
+    });
+}
+
+function renderCategoryGroups() {
+    const selectedWeek = getSelectedWeek();
+    const categoryFilter = document.getElementById('category-filter').value;
+    const searchValue = document.getElementById('keyword-search').value.trim().toLowerCase();
+    const tabsContainer = document.getElementById('keyword-tabs');
+    const panelContainer = document.getElementById('keyword-panel');
+    const groups = reportData.categoryGroups || [];
+
+    if (!groups.length) {
+        panelContainer.innerHTML = '<div class="empty-state">داده‌ای یافت نشد.</div>';
+        return;
+    }
+
+    if (!groups.some(group => group.key === activeKeywordTab)) {
+        activeKeywordTab = groups[0].key;
+    }
+
+    tabsContainer.innerHTML = groups.map(group => `
+        <button
+            class="keyword-tab-button ${group.key === activeKeywordTab ? 'active' : ''}"
+            data-kw-tab="${group.key}"
+            onclick="openKeywordTab('${group.key}')"
+        >${group.title}</button>
+    `).join('');
+
+    const activeGroup = groups.find(group => group.key === activeKeywordTab) || groups[0];
+    const filteredRows = (activeGroup.rows || [])
+        .map(row => {
+            const metrics = getWeekMetrics(row.metrics, selectedWeek);
+            return {
+                category: row.category || '',
+                keyword: row.keyword || '',
+                impressions: metrics.impressions ?? null,
+                position: metrics.position ?? null,
+                metrics: row.metrics || {},
+            };
+        })
+        .filter(row => {
+            const categoryMatch = categoryFilter === 'all' || row.category === categoryFilter;
+            const keywordMatch = !searchValue || String(row.keyword).toLowerCase().includes(searchValue);
+            return categoryMatch && keywordMatch;
+        });
+
+    if (selectedKeywordIndex >= filteredRows.length) {
+        selectedKeywordIndex = 0;
+    }
+    currentKeywordRows = filteredRows;
+
+    const trendSelect = document.getElementById('kw-trend-select');
+    if (trendSelect) {
+        trendSelect.innerHTML = filteredRows.map((row, index) => `
+            <option value="${index}">${row.keyword}${row.category ? ' (' + row.category + ')' : ''}</option>
+        `).join('');
+        if (filteredRows.length) {
+            trendSelect.value = String(selectedKeywordIndex);
+        }
+    }
+
+    let totalImp = 0;
+    let weightedPos = 0;
+    let posWeight = 0;
+    filteredRows.forEach(row => {
+        const imp = Number(row.impressions || 0);
+        totalImp += imp;
+        if (imp > 0 && row.position !== null && row.position !== undefined) {
+            weightedPos += imp * Number(row.position);
+            posWeight += imp;
+        }
+    });
+    const avgPos = posWeight ? weightedPos / posWeight : null;
+
+    const bodyRows = filteredRows.map((row, index) => `
+        <tr class="kw-row${index === selectedKeywordIndex ? ' selected' : ''}" onclick="selectKeywordForTrend(${index})">
+            <td class="text-col">${row.category}</td>
+            <td class="text-col">${row.keyword}</td>
+            <td>${row.impressions === null || row.impressions === undefined ? '-' : formatNumber(row.impressions)}</td>
+            <td>${formatPosition(row.position)}</td>
+        </tr>
+    `).join('');
+
+    panelContainer.innerHTML = `
+        <div class="keyword-panel-head">
+            <div class="keyword-panel-title">${activeGroup.title}</div>
+            <div class="keyword-panel-week">${selectedWeek}</div>
+        </div>
+        <div class="table-scroll">
+            <table class="sheet-table">
+                <thead>
+                    <tr>
+                        <th class="text-col">Category</th>
+                        <th class="text-col">Seed Keyword</th>
+                        <th>IMP</th>
+                        <th>Po</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${bodyRows || '<tr><td colspan="4">داده‌ای برای این فیلتر وجود ندارد.</td></tr>'}
+                    ${filteredRows.length ? `
+                        <tr class="total-row">
+                            <td class="text-col" colspan="2">Total / Weighted Average</td>
+                            <td>${formatNumber(totalImp)}</td>
+                            <td>${formatPosition(avgPos)}</td>
+                        </tr>
+                    ` : ''}
+                </tbody>
+            </table>
+        </div>
+        <div class="kw-trend-panel">
+            <div class="kw-trend-title">ترند پوزیشن (Po)</div>
+            <div class="kw-trend-note">روی هر ردیف کلیک کنید یا از لیست کلیدواژه انتخاب کنید. محور Y معکوس است — پوزیشن پایین‌تر بهتر است.</div>
+            <div class="kw-trend-chart-wrap">
+                <canvas id="keyword-po-chart"></canvas>
+            </div>
+        </div>
+    `;
+
+    renderKeywordPoTrendChart();
+}
+
+function renderKpiTable(tableId, metricNames, highlightWeek = null) {
+    const table = document.getElementById(tableId);
+    const weeks = reportData.weekLabels;
+    const thead = table.querySelector('thead');
+    const tbody = table.querySelector('tbody');
+
+    thead.innerHTML = `
+        <tr>
+            <th>Metric</th>
+            ${weeks.map(week => `<th>${weekCode(week)}</th><th>Growth</th>`).join('')}
+        </tr>
+    `;
+
+    tbody.innerHTML = metricNames.map(metricName => {
+        const cells = [`<td class="metric-name">${metricName}</td>`];
+        weeks.forEach(week => {
+            const value = metricValue(metricName, week);
+            const growth = metricGrowth(metricName, week);
+            const isHighlight = highlightWeek && week === highlightWeek;
+            const valueText = metricName.toLowerCase().includes('share') || metricName === 'ctr'
+                ? formatPercent(value)
+                : metricName === 'rank'
+                    ? (value === null ? '-' : Number(value).toFixed(1))
+                    : formatNumber(value);
+            const growthClass = growth > 0 ? 'positive' : growth < 0 ? 'negative' : 'neutral';
+            const growthText = growth === null || growth === undefined ? '-' : `${growth > 0 ? '+' : ''}${Number(growth).toFixed(1)}%`;
+            cells.push(`<td style="${isHighlight ? 'background:rgba(255,122,0,0.12);' : ''}">${valueText}</td>`);
+            cells.push(`<td><span class="change-pill ${growthClass}">${growthText}</span></td>`);
+        });
+        return `<tr>${cells.join('')}</tr>`;
+    }).join('');
+}
+
+function refreshDashboard() {
+    renderSearchConsoleCards();
+    renderScTrendChart();
+    renderCategoryGroups();
+    renderKpiTable('business-table', reportData.businessMetrics, getScWeek());
+    renderKpiTable('kpi-table', Object.keys(reportData.kpiMetrics), getScWeek());
+
+    const selectedWeek = getSelectedWeek();
+    const previousWeek = getPreviousWeek(selectedWeek);
+    document.getElementById('compare-note').innerHTML =
+        `تفکیک کلیدواژه‌ها | هفته: <strong>${selectedWeek}</strong> در برابر <strong>${previousWeek || '-'}</strong>`;
+    document.getElementById('footer-week-note').textContent =
+        `SC: ${getScWeek()} | Keywords: ${selectedWeek}`;
+}
+
+function openTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(node => node.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(node => node.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+}
+
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => openTab(button.dataset.tab));
+});
+
+['sc-week-filter', 'sc-trend-range'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+        renderSearchConsoleCards();
+        renderScTrendChart();
+        renderKpiTable('business-table', reportData.businessMetrics, getScWeek());
+        renderKpiTable('kpi-table', Object.keys(reportData.kpiMetrics), getScWeek());
+        document.getElementById('footer-week-note').textContent =
+            `SC: ${getScWeek()} | Keywords: ${getSelectedWeek()}`;
+    });
+});
+
+['week-filter', 'category-filter'].forEach(id => {
+    document.getElementById(id).addEventListener('change', () => {
+        renderCategoryGroups();
+        const selectedWeek = getSelectedWeek();
+        const previousWeek = getPreviousWeek(selectedWeek);
+        document.getElementById('compare-note').innerHTML =
+            `تفکیک کلیدواژه‌ها | هفته: <strong>${selectedWeek}</strong> در برابر <strong>${previousWeek || '-'}</strong>`;
+        document.getElementById('footer-week-note').textContent =
+            `SC: ${getScWeek()} | Keywords: ${selectedWeek}`;
+    });
+});
+document.getElementById('keyword-search').addEventListener('input', renderCategoryGroups);
+
+['kw-from-week', 'kw-to-week'].forEach(id => {
+    document.getElementById(id).addEventListener('change', renderKeywordPoTrendChart);
+});
+document.getElementById('kw-trend-select').addEventListener('change', event => {
+    selectKeywordForTrend(Number(event.target.value));
+});
+
+populateKeywordTrendFilters();
+refreshDashboard();
+</script>
+</body>
+</html>

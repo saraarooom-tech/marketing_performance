@@ -15,6 +15,11 @@ def home():
     html_path = BASE_DIR / "weekly_report.html"
     return html_path.read_text(encoding="utf-8")
 
+@app.get("/seo", response_class=HTMLResponse)
+def seo_report():
+    html_path = BASE_DIR / "seo" / "seo_weekly_report.html"
+    return html_path.read_text(encoding="utf-8")
+
 @app.get("/weekly_report.png")
 def weekly_report_image():
     image_path = BASE_DIR / "weekly_report.png"
