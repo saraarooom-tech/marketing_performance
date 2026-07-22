@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>All in One Digital — Khodro45</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0e1116;
+    --bg-soft: #151a22;
+    --steel-1: #d7dde5;
+    --steel-2: #838b97;
+    --steel-3: #454c58;
+    --ink: #e7ebf1;
+    --ink-dim: #8b93a1;
+    --amber: #ff8a4c;
+    --teal: #46d1c1;
+    --violet: #a98cf7;
+    --blue: #5b9dff;
+    --line: rgba(231,235,241,0.08);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    background: radial-gradient(circle at 50% 30%, #171d27 0%, #0e1116 55%, #0a0c10 100%);
+    color: var(--ink);
+    font-family: 'Vazirmatn', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  body{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: 48px 20px 70px;
+  }
+  .grid-bg{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 42px 42px;
+    -webkit-mask-image: radial-gradient(circle at 50% 40%, black 0%, transparent 72%);
+            mask-image: radial-gradient(circle at 50% 40%, black 0%, transparent 72%);
+  }
+  header{
+    position:relative; z-index:1;
+    text-align:center;
+    max-width:640px;
+    margin-bottom: 26px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    color: var(--ink-dim);
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  h1{
+    font-weight:900;
+    font-size: clamp(26px, 4vw, 38px);
+    line-height:1.3;
+    letter-spacing:-.01em;
+  }
+  h1 span{ color: var(--steel-1); }
+  .system{
+    position:relative;
+    z-index:1;
+    width: min(600px, 94vw);
+    aspect-ratio: 1 / 1.06;
+    margin: 6px 0 10px;
+  }
+  .gear{
+    position:absolute;
+    transform: translate(-50%, -50%);
+  }
+  .gear .rotor{
+    display:block;
+    filter: drop-shadow(0 6px 18px rgba(0,0,0,0.45));
+  }
+  .gear .rotor.cw{ animation: spin 30s linear infinite; }
+  .gear .rotor.ccw{ animation: spin 30s linear infinite reverse; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  .gear .hub{
+    position:absolute;
+    top:50%; left:50%;
+    transform: translate(-50%,-50%);
+    width: 40%;
+    aspect-ratio:1/1;
+    border-radius:50%;
+    background: var(--bg-soft);
+    border: 1px solid var(--hub-c, var(--line));
+    display:flex; align-items:center; justify-content:center;
+    text-decoration:none;
+    color: var(--hub-c, var(--ink));
+    transition: transform .25s ease, box-shadow .25s ease;
+    box-shadow: 0 0 0 0 transparent;
+  }
+  .gear .hub svg{ width: 44%; height:44%; }
+  .gear .hub:hover, .gear .hub:focus-visible{
+    transform: translate(-50%,-50%) scale(1.1);
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--hub-c) 14%, transparent);
+    outline:none;
+  }
+  @media (max-width: 560px){
+    .system{ width: 100%; aspect-ratio: 1/1.3; }
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<header>
+  <div class="eyebrow">⚙ Control Room</div>
+  <h1>All in One Digital <span>— Khodro45</span></h1>
+</header>
+
+<div class="system" id="system"></div>
+
+<script>
+(function(){
+  const NS = "http://www.w3.org/2000/svg";
+
+  function polar(cx, cy, r, deg){
+    const rad = deg * Math.PI / 180;
+    return [ (cx + r*Math.cos(rad)).toFixed(2), (cy + r*Math.sin(rad)).toFixed(2) ];
+  }
+
+  function gearPoints(teeth, outerR, innerR){
+    const pts = [];
+    const step = 360/teeth;
+    for(let i=0;i<teeth;i++){
+      const a0 = i*step;
+      const toothHalf = step*0.26;
+      const baseHalf = step*0.5;
+      pts.push(polar(50,50, innerR, a0 - baseHalf));
+      pts.push(polar(50,50, outerR, a0 - toothHalf));
+      pts.push(polar(50,50, outerR, a0 + toothHalf));
+      pts.push(polar(50,50, innerR, a0 + baseHalf));
+    }
+    return pts.map(p=>p.join(',')).join(' ');
+  }
+
+  function buildGearSVG(teeth, colorVar, spin){
+    const outerR = 46, innerR = 36, holeR = 20;
+    const svg = document.createElementNS(NS,'svg');
+    svg.setAttribute('viewBox','0 0 100 100');
+    svg.classList.add('rotor', spin);
+
+    const grad = document.createElementNS(NS,'linearGradient');
+    const gid = 'g'+Math.random().toString(36).slice(2,9);
+    grad.setAttribute('id', gid);
+    grad.setAttribute('x1','0'); grad.setAttribute('y1','0');
+    grad.setAttribute('x2','1'); grad.setAttribute('y2','1');
+    [['0%','#e7ebf1'],['55%','#9aa2ad'],['100%','#4b515c']].forEach(([o,c])=>{
+      const stop = document.createElementNS(NS,'stop');
+      stop.setAttribute('offset', o);
+      stop.setAttribute('stop-color', c);
+      grad.appendChild(stop);
+    });
+    const defs = document.createElementNS(NS,'defs');
+    defs.appendChild(grad);
+    svg.appendChild(defs);
+
+    const poly = document.createElementNS(NS,'polygon');
+    poly.setAttribute('points', gearPoints(teeth, outerR, innerR));
+    poly.setAttribute('fill', `url(#${gid})`);
+    poly.setAttribute('stroke', colorVar);
+    poly.setAttribute('stroke-opacity','0.35');
+    poly.setAttribute('stroke-width','0.6');
+    svg.appendChild(poly);
+
+    const rim = document.createElementNS(NS,'circle');
+    rim.setAttribute('cx','50'); rim.setAttribute('cy','50'); rim.setAttribute('r', innerR-1);
+    rim.setAttribute('fill','none');
+    rim.setAttribute('stroke','#2a2f38');
+    rim.setAttribute('stroke-width','1');
+    svg.appendChild(rim);
+
+    const hole = document.createElementNS(NS,'circle');
+    hole.setAttribute('cx','50'); hole.setAttribute('cy','50'); hole.setAttribute('r', holeR);
+    hole.setAttribute('fill', '#0e1116');
+    svg.appendChild(hole);
+
+    return svg;
+  }
+
+  const ICONS = {
+    performance: '<path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m2 12 4 0"/><path d="m4.9 4.9 2.9 2.9"/><circle cx="12" cy="12" r="4"/><path d="m12 12 3-3"/>',
+    ecrm: '<path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    seo: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    data: '<path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/>'
+  };
+
+  const LABELS = {
+    performance: 'Performance',
+    ecrm: 'eCRM',
+    seo: 'SEO',
+    data: 'Digital Team Data'
+  };
+
+  const REPORT_LINKS = {
+    performance: "https://marketing-performance.vercel.app/",
+    ecrm:        "#",
+    seo:         "https://marketing-performance.vercel.app/seo",
+    data:        "#"
+  };
+
+  const GEARS = [
+    { x:68, y:20, size:40, teeth:18, spin:'cw',  color:'var(--amber)',  key:'performance' },
+    { x:44, y:38, size:30, teeth:14, spin:'ccw', color:'var(--teal)',   key:'ecrm' },
+    { x:60, y:56, size:20, teeth:10, spin:'cw',  color:'var(--violet)', key:'seo' },
+    { x:36, y:72, size:34, teeth:16, spin:'ccw', color:'var(--blue)',   key:'data' }
+  ];
+
+  const DECOR = [
+    { x:86, y:8,  size:15, teeth:8, spin:'ccw' },
+    { x:16, y:26, size:17, teeth:9, spin:'cw'  },
+    { x:80, y:46, size:13, teeth:7, spin:'ccw' },
+    { x:14, y:90, size:16, teeth:8, spin:'cw'  },
+    { x:56, y:86, size:12, teeth:7, spin:'cw'  }
+  ];
+
+  const system = document.getElementById('system');
+
+  DECOR.forEach(d=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'gear decor';
+    wrap.style.left = d.x + '%';
+    wrap.style.top = d.y + '%';
+    wrap.style.width = d.size + '%';
+    wrap.style.aspectRatio = '1/1';
+    wrap.style.opacity = '0.55';
+    const svg = buildGearSVG(d.teeth, 'var(--steel-3)', d.spin);
+    wrap.appendChild(svg);
+    system.appendChild(wrap);
+  });
+
+  GEARS.forEach(g=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'gear';
+    wrap.style.left = g.x + '%';
+    wrap.style.top = g.y + '%';
+    wrap.style.width = g.size + '%';
+    wrap.style.aspectRatio = '1/1';
+
+    const svg = buildGearSVG(g.teeth, g.color, g.spin);
+    wrap.appendChild(svg);
+
+    const hub = document.createElement('a');
+    hub.className = 'hub';
+    hub.href = REPORT_LINKS[g.key];
+    hub.style.setProperty('--hub-c', g.color);
+    hub.title = LABELS[g.key];
+    hub.setAttribute('aria-label', LABELS[g.key]);
+    hub.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[g.key]}</svg>`;
+    if (REPORT_LINKS[g.key] === '#') {
+      hub.addEventListener('click', (e)=> e.preventDefault());
+    } else {
+      hub.target = '_blank';
+      hub.rel = 'noopener';
+    }
+    wrap.appendChild(hub);
+
+    system.appendChild(wrap);
+  });
+})();
+</script>
+</body>
+</html>
